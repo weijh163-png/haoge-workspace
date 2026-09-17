@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>浩哥工作台 · 收入核算</title>
+<title>示例·成本会计工作台</title>
 <style>
 :root{
   --pri:#2563eb;--pri-l:#dbeafe;--pri-d:#1d4ed8;
@@ -493,7 +493,7 @@ dialog.work-dialog{border:1px solid var(--border);border-radius:10px;padding:26p
 <div class="cloud-backdrop" aria-hidden="true"><div class="glass-sheet"></div></div>
 
 <nav class="nav-bar">
-  <div class="nav-brand">浩哥工作台 <span>收入核算科 v2</span></div>
+  <div class="nav-brand">成本会计工作台 <span>餐饮成本核算 vDemo</span></div>
   <div class="nav-tabs" role="tablist" aria-label="工作台模块">
     <button type="button" class="nav-tab active" id="nav-dashboard" role="tab" aria-selected="true" aria-controls="dashboard" onclick="switchTab('dashboard')">首页 · 今日</button>
     <button type="button" class="nav-tab" id="nav-workflow" role="tab" aria-selected="false" aria-controls="workflow" onclick="switchTab('workflow')">月度工作流程</button>
@@ -506,14 +506,14 @@ dialog.work-dialog{border:1px solid var(--border);border-radius:10px;padding:26p
 </nav>
 
 <div class="container">
-<div class="period-toolbar"><span class="period-note">收入核算工作台 · 本地离线版</span><label for="periodSelect">工作月份</label><input id="periodSelect" type="month" onchange="changePeriod(this.value)"><span id="saveStatus" role="status" aria-live="polite">本地记录</span></div>
+<div class="period-toolbar"><span class="period-note">演示版 · 基于浩哥工作台模板生成</span><label for="periodSelect">工作月份</label><input id="periodSelect" type="month" onchange="changePeriod(this.value)"><span id="saveStatus" role="status" aria-live="polite">本地记录</span></div>
 <div class="storage-warning" id="storageWarning" hidden><span id="storageWarningText"></span> <button class="text-button" onclick="openBackupDialog()">备份与记录 →</button></div>
 
 <!-- ==================== Module 1: Dashboard ==================== -->
 <section class="module active" id="dashboard">
   <header class="today-heading">
     <div><h1 id="dashboardTitle">今天，先做好重要的事</h1><p id="dashboardDate"></p></div>
-    <button class="exam-mini" onclick="openExamModal()"><strong>税务师考试</strong><span id="examMiniText">查看考试安排</span></button>
+    <button class="exam-mini" onclick="openExamModal()"><strong>初级会计师考试</strong><span id="examMiniText">查看考试安排</span></button>
   </header>
   <div class="month-focus-box" id="monthFocusBox"><h3>🎯 本月重点</h3><p id="monthFocusText">加载中...</p><div class="focus-meta"><button class="text-button" onclick="editMonthFocus()">编辑重点</button></div></div>
   <div class="month-rhythm"><strong>本月节奏</strong><div id="rhythmStages"></div><button class="text-button" onclick="switchTab('workflow')">完整月度流程 →</button></div>
@@ -1121,19 +1121,19 @@ dialog.work-dialog{border:1px solid var(--border);border-radius:10px;padding:26p
 <div id="examModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center" onclick="closeExamModal(event)">
   <div style="background:var(--card);border-radius:var(--radius);box-shadow:0 20px 60px rgba(0,0,0,.2);padding:24px;max-width:480px;width:90%;position:relative;animation:modalIn .3s ease" onclick="event.stopPropagation()">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div class="card-title" style="margin:0"><span class="ico">📚</span> 全部考试倒计时</div>
+      <div class="card-title" style="margin:0"><span class="ico">📚</span> 全部考试安排</div>
       <button style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--muted);padding:4px" onclick="closeExamModal()">×</button>
     </div>
     <div style="display:flex;flex-direction:column;gap:12px">
       <div style="background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;border-radius:8px;padding:16px;text-align:center">
         <div style="font-size:32px;font-weight:800" id="jingjiDaysModal">-</div>
-        <div style="font-size:14px;font-weight:600;margin-top:4px">中级经济师</div>
-        <div style="font-size:11px;opacity:.8">2026年11月7-8日</div>
+        <div style="font-size:14px;font-weight:600;margin-top:4px">初级会计师</div>
+        <div style="font-size:11px;opacity:.8">2027年5月15-19日</div>
       </div>
       <div style="background:linear-gradient(135deg,#0d9488,#34d399);color:#fff;border-radius:8px;padding:16px;text-align:center">
         <div style="font-size:32px;font-weight:800" id="shuiwuDaysModal">-</div>
-        <div style="font-size:14px;font-weight:600;margin-top:4px">税务师三科</div>
-        <div style="font-size:11px;opacity:.8">2026年11月14-15日</div>
+        <div style="font-size:14px;font-weight:600;margin-top:4px">中级会计师</div>
+        <div style="font-size:11px;opacity:.8">2027年9月4-5日</div>
       </div>
     </div>
     <div style="margin-top:16px;text-align:center;font-size:12px;color:var(--muted)">日期沿用已有记录，请以官方通知为准。关闭页面后不运行后台提醒。</div>
@@ -1223,19 +1223,14 @@ const MONTHLY_TASKS = [
 ];
 
 const NOTICES = [
-  {title:'借贷方向负数检查',body:'1) 核实是否有借贷方向为负数情况，如有及时纠正；\n2) 应交税费/暂估销项税额核实是否有借贷方向为负数情况，如有及时纠正。'},
-  {title:'销项税额与开票系统核对',body:'核对销项税额与开票系统税额一致。\n核对顺序：先核对销项税额，后核对收入。'},
-  {title:'总账收入与开票系统核对',body:'总账收入 = 主营业务收入/餐饮收入 + 商品销售收入 + 其他服务收入。\n核对总账收入与开票系统收入一致。\n注意：先核对销项税额，后核对收入。'},
-  {title:'出售固定资产税金处理',body:'出售固定资产，制单时税金要从全额营业额中手动扣除。'},
-  {title:'红冲上月发票操作',body:'1) 先生成对应的收款单（删掉其他金额，只保留红冲金额），点删除对应的收款单金额；\n2) 找到对应的应收单，红冲对应的收款金额；\n3) 项目提供红冲发票申请，并重新做收款计划和应收单。'},
-  {title:'制单顺序',body:'制单顺序：先做收款计划单据，后做应收单单据。'},
-  {title:'银行收款与收款单金额不符',body:'查询方法：\n1) 点击收款单管理 → 未生效的单据 → 联查单据 → 收款计划；\n2) 确认冲销金额是否与银行回单金额一致；\n3) 如果一致，手动修改收款单管理的"组织本币金额"（贷方）与银行保持一致；\n4) 尾款待下次进账时，自制收款单查询该金额。'},
-  {title:'第三方收款次月补开票',body:'次月月上旬中旬，提醒有第三方收入的项目，提交上月第三方收入的开票申请和应收单；\n冲销上月收款计划对应的预估收入。\n好哒、迅付、富友三家平台：根据收款总额扣减上月已开票金额，剩余差额补开票。'},
-  {title:'徐州医科大开票流程',body:'1) 先根据开票申请表开收据，当天寄出；\n2) 校方结算单待收据提供后先交收据才提供，不盖章，分部负责人签字；\n3) 先开收据，后开发票（收据开的全额，发票开的差额）；\n4) 收据、开票申请和最后实际开的发票放在一起，当月开票。'},
-  {title:'卡机开票附件要求',body:'卡机开票附件：要有校方盖章版本结算单或者分部负责人签字。'},
-  {title:'收款计划税率漏做',body:'给非高校客户开具的餐费发票，收款计划应据实填写6%税率；\n如涉及分组作业，记得从分组作业中扣回该税金，避免项目损失。'},
-  {title:'避免收入重复',body:'开票前与项目确认，该笔费用项目是否做到了上月的收款计划；\n避免同一笔收入上月和本月均做收款计划；\n注意：不是根据摘要日期判定，而是与项目确认。'},
-  {title:'收入确认原则',body:'1) 当月收入做当月收款计划，做当月应收单；\n2) 开具以前月份收入的发票，做应收单，冲销以前收款计划。'}
+  {
+    title: '示例提醒：演示新增',
+    body: '这条是通过 config 新增的提醒，用于验证数据可替换。'
+  },
+  {
+    title: '制单顺序',
+    body: '制单顺序：先做收款计划单据，后做应收单单据。'
+  }
 ];
 
 const TAX_COMPANIES = [
@@ -1259,8 +1254,8 @@ const REPORTS = [
 ];
 
 // ==================== State ====================
-const STORAGE_KEY = 'haoge_workspace_v3';
-const LEGACY_STORAGE_KEY = 'haoge_workspace_v2';
+const STORAGE_KEY = 'demo_cost_workspace_v1';
+const LEGACY_STORAGE_KEY = 'demo_cost_workspace_v0';
 const MONTH_FIELDS = ['tasks','reports','tax','reportWorkflow','reportEvidence','checklist','projects','zakou','stats'];
 function localDate(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function isPeriod(s){return typeof s==='string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(s);}
@@ -1313,14 +1308,14 @@ function changePeriod(value){
 }
 function downloadJSON(name,data){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
 function exportBackup(){
-  let reviews=null;try{reviews=localStorage.getItem('haoge_fc_reviews');}catch(_){}
+  let reviews=null;try{reviews=localStorage.getItem('demo_fc_reviews');}catch(_){}
   // Keep the exact review key of this legacy app alongside any other backup data.
   try{if(typeof FC_REVIEW_KEY!=='undefined')reviews=localStorage.getItem(FC_REVIEW_KEY);}catch(_){}
-  downloadJSON('浩哥工作台-备份-'+localDate()+'.json',{app:'haoge-workbench',version:3,exportedAt:new Date().toISOString(),data:savedPayload(),reviews});
+  downloadJSON('成本会计工作台-备份-'+localDate()+'.json',{app:'demo-cost-workbench',version:3,exportedAt:new Date().toISOString(),data:savedPayload(),reviews});
 }
 function applyBackupText(raw){
   const p=cleanParse(raw);let next;
-  if(p&&p.app==='haoge-workbench'&&p.version===3)next=p.data;
+  if(p&&p.app==='demo-cost-workbench'&&p.version===3)next=p.data;
   else if(p&&p.version===3&&p.months)next=p;
   else if(isRecord(p)&&(p.tasks||p.reports||p.tax)){
     state.legacy={raw,sourceKey:'导入的旧版备份',assignedPeriod:null};saveData();refreshWorkspace();return 'legacy';
@@ -1399,8 +1394,8 @@ function updateDateDisplay(){
   const todayTitle=document.getElementById('todayTitle');if(todayTitle?.firstChild)todayTitle.firstChild.textContent=live?'今日安排':'本月记录';
   const todayLink=document.getElementById('todayPeriodLink');if(todayLink){todayLink.textContent=live?'查看本月':'回到当前月';todayLink.onclick=()=>live?switchTab('workflow'):changePeriod(localDate(now).slice(0,7));}
   const period=document.getElementById('periodSelect');if(period)period.value=state.activePeriod;
-  const remaining=Math.round((new Date(2026,10,14)-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/86400000);
-  document.getElementById('examMiniText').textContent=remaining>0?`还有 ${remaining} 天 · 11月14–15日`:remaining>=-1?'考试期间 · 查看安排':'考试日期已过 · 查看安排';
+  const remaining=Math.round((new Date(2027,4,15)-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/86400000);
+  document.getElementById('examMiniText').textContent=remaining>0?`还有 ${remaining} 天 · 5月15–19日`:remaining>=-1?'考试期间 · 查看安排':'考试日期已过 · 查看安排';
   const day=currentWorkDay(),phases=[['交报表','1–4日',day<=4],['统计申报','5–10日',day>4&&day<=10],['月中跟进','11–25日',day>10&&day<=25],['月末收口','26日–月底',day>25]];
   document.getElementById('rhythmStages').innerHTML=phases.map(p=>`<button class="rhythm-stage${live&&p[2]?' current':''}" onclick="switchTab('workflow')"><strong>${p[0]}</strong><span>${p[1]}${live&&p[2]?' · 当前阶段':''}</span></button>`).join('');
   const mf=document.getElementById('monthFocusText'),focus=(state.monthFocus||{})[state.activePeriod]||[],focusBox=document.getElementById('monthFocusBox');
@@ -1502,8 +1497,8 @@ function openExamModal(){
   if(!modal) return;
   modal.style.display = 'flex';
   const now = new Date();
-  const jingji = new Date('2026-11-07');
-  const shuiwu = new Date('2026-11-14');
+  const jingji = new Date('2027-05-15');
+  const shuiwu = new Date('2027-09-04');
   const jm = document.getElementById('jingjiDaysModal');
   const sm = document.getElementById('shuiwuDaysModal');
   const toDays = (d) => { const n = Math.ceil((d - now)/(1000*60*60*24)); return n > 0 ? n + '天' : '已结束'; };
@@ -2274,7 +2269,7 @@ function fcInitEditor() {
 }
 
 // ==================== Monthly Review ====================
-var FC_REVIEW_KEY = 'haoge_fc_review';
+var FC_REVIEW_KEY = 'demo_fc_review';
 
 function fcGetReviewMonths() {
   var now = new Date();

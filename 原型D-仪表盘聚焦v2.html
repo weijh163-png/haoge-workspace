@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>浩哥工作台 · 原型D · 仪表盘聚焦</title>
+<style>
+:root{
+  --pri:#2563eb;--pri-l:#eff6ff;--pri-d:#1e40af;
+  --teal:#0d9488;--teal-l:#f0fdfa;
+  --amber:#d97706;--amber-l:#fffbeb;
+  --green:#16a34a;--green-l:#f0fdf4;
+  --red:#dc2626;--red-l:#fef2f2;
+  --slate:#64748b;--slate-l:#f8fafc;
+  --bg:#f8fafc;--card:#fff;--border:#e5e7eb;
+  --text:#111827;--muted:#6b7280;--radius:12px;
+  --shadow:0 1px 2px rgba(16,24,40,.05);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5}
+/* ===== 顶部导航栏（保留） ===== */
+.nav-bar{background:#fff;border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nav-brand{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700}
+.nav-brand .logo{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#2563eb,#0d9488);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px}
+.nav-brand small{font-size:11px;color:var(--muted);font-weight:400}
+.nav-tabs{display:flex;gap:2px}
+.nav-tab{padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--muted);transition:.15s;user-select:none}
+.nav-tab:hover{background:var(--slate-l);color:var(--text)}
+.nav-tab.active{background:var(--pri-l);color:var(--pri);font-weight:600}
+.nav-date{font-size:12px;color:var(--muted)}
+/* ===== 布局 ===== */
+.wrap{max-width:1280px;margin:0 auto;padding:16px 20px}
+.dash-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.dash-head h1{font-size:18px}
+.dash-head .sub{font-size:12px;color:var(--muted);margin-top:2px}
+.ring-row{display:flex;justify-content:space-between;align-items:center;gap:12px;background:linear-gradient(135deg,#1e3a5f,#2563eb);border-radius:14px;padding:16px 22px;color:#fff;margin-bottom:14px}
+.ring-row .greet{flex:1}
+.ring-row .greet h2{font-size:17px}
+.ring-row .greet p{font-size:12px;opacity:.8;margin-top:3px}
+.kpi{display:flex;gap:18px}
+.kpi .kv{text-align:center}
+.kpi .kv .vn{font-size:22px;font-weight:700}
+.kpi .kv .vl{font-size:10.5px;opacity:.75}
+.grid{display:grid;grid-template-columns:1.35fr 1fr;gap:12px;align-items:start}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
+.card-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.card-h .t{font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px}
+.card-h .t .bar{width:3px;height:14px;border-radius:2px;background:var(--pri)}
+.badge{font-size:11px;font-weight:600;padding:2px 9px;border-radius:99px}
+.b-b{background:var(--pri-l);color:var(--pri)}
+.b-g{background:var(--green-l);color:var(--green)}
+/* 待办 */
+.todo-item{display:flex;align-items:center;gap:9px;padding:9px 8px;border-radius:8px;cursor:pointer;transition:.15s}
+.todo-item:hover{background:var(--slate-l)}
+.todo-item input{width:16px;height:16px;accent-color:var(--pri);cursor:pointer;flex-shrink:0}
+.todo-item .nm{flex:1;font-size:12.5px}
+.todo-item .tm{font-size:10.5px;color:var(--muted);flex-shrink:0}
+.todo-item .tag{font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;flex-shrink:0}
+.tag-p{background:var(--red-l);color:var(--red)}
+.tag-m{background:var(--amber-l);color:var(--amber)}
+.todo-item.done .nm{text-decoration:line-through;color:var(--muted)}
+.done-toggle{margin-top:6px;font-size:12px;color:var(--green);cursor:pointer;padding:8px;border-radius:8px;text-align:center;background:var(--green-l);user-select:none}
+.done-list{display:none;margin-top:5px}
+.done-list.open{display:block}
+.done-list .todo-item .nm{color:var(--muted);text-decoration:line-through}
+/* 报表迷你格子 */
+.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.rp{display:flex;align-items:center;gap:6px;font-size:11.5px;padding:7px 8px;border:1px solid var(--border);border-radius:8px}
+.rp .ok{margin-left:auto;color:var(--green);font-weight:700}
+.rp .dept{font-size:9.5px;color:var(--muted);display:block}
+/* 环形 */
+.prog-ring{display:flex;align-items:center;gap:14px}
+.ring{--v:100;width:64px;height:64px;border-radius:50%;background:conic-gradient(var(--green) calc(var(--v)*1%),var(--slate-l) 0);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ring>div{width:48px;height:48px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text)}
+.ring.tax{--v:100;background:conic-gradient(var(--teal) calc(var(--v)*1%),var(--slate-l) 0)}
+.alert{display:flex;gap:8px;padding:9px 10px;border-radius:9px;font-size:11.5px;margin-bottom:7px}
+.alert:last-child{margin-bottom:0}
+.alert .ic{flex-shrink:0}
+.alert.a{background:var(--amber-l)}
+.alert.r{background:var(--red-l)}
+.alert.t{background:var(--teal-l)}
+.foot{text-align:center;font-size:11px;color:var(--muted);margin-top:16px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}.kpi{gap:10px}.kpi .kv .vn{font-size:18px}}
+</style>
+</head>
+<body>
+<nav class="nav-bar">
+  <div class="nav-brand"><div class="logo">浩</div>浩哥工作台<small>收入核算科</small></div>
+  <div class="nav-tabs">
+    <div class="nav-tab active">首页</div>
+    <div class="nav-tab">工作流程</div>
+    <div class="nav-tab">报表台账</div>
+    <div class="nav-tab">税务申报</div>
+    <div class="nav-tab">流程图与复盘</div>
+  </div>
+  <div class="nav-date" id="navDate"></div>
+</nav>
+<div class="wrap">
+  <div class="dash-head">
+    <div>
+      <h1>仪表盘 📊</h1>
+      <div class="sub">常规期 · 关键指标与今日计划，一眼掌握全局</div>
+    </div>
+  </div>
+
+  <div class="ring-row">
+    <div class="greet">
+      <h2>浩哥，早上好 👋</h2>
+      <p>2026-09-11 周五 · 距结账 15 天</p>
+    </div>
+    <div class="kpi">
+      <div class="kv"><div class="vn" id="kTodo">5</div><div class="vl">待办</div></div>
+      <div class="kv"><div class="vn">7/7</div><div class="vl">报表</div></div>
+      <div class="kv"><div class="vn">6/6</div><div class="vl">税务</div></div>
+      <div class="kv"><div class="vn">64</div><div class="vl">考试/天</div></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- 左：今日待办 -->
+    <div class="card">
+      <div class="card-h"><div class="t"><span class="bar"></span>今日待办</div><div class="badge b-b" id="todoCnt">5 项</div></div>
+      <div id="todoList"></div>
+      <div class="done-toggle" onclick="toggleDone()">✓ 已完成（<span id="doneCnt">0</span>）— 点击展开</div>
+      <div class="done-list" id="doneList"></div>
+    </div>
+    <!-- 右：进度 + 注意 -->
+    <div>
+      <div class="card">
+        <div class="card-h"><div class="t"><span class="bar" style="background:var(--green)"></span>本月进度</div></div>
+        <div class="prog-ring">
+          <div class="ring"><div>7/7</div></div>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:600">月度报表</div>
+            <div style="font-size:10.5px;color:var(--muted)">7 份全部上交</div>
+          </div>
+          <div class="ring tax"><div>6/6</div></div>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:600">税务申报</div>
+            <div style="font-size:10.5px;color:var(--muted)">6 家全部完成</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="t"><span class="bar" style="background:var(--amber)"></span>注意事项</div></div>
+        <div class="alert a"><div class="ic">📊</div><div>同期营业额表填<b>差额</b>非全额；2027 取消</div></div>
+        <div class="alert r"><div class="ic">📍</div><div>应收三表：空调公式 / 利得行跨期 / 餐饮覆盖期间</div></div>
+        <div class="alert t"><div class="ic">🧮</div><div>差额营业额 = 账面 + 3 家应收借方发生额</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="card-h"><div class="t"><span class="bar" style="background:var(--teal)"></span>7 份月度报表</div><div class="badge b-g">全部完成</div></div>
+    <div class="report-grid" id="rptGrid"></div>
+  </div>
+
+  <div class="foot">浩哥工作台 v3 · 原型D 仪表盘聚焦 · 数据保存在本地浏览器</div>
+</div>
+<script>
+const TODAY=[{n:'复核21个项目收入凭证',tm:'上午',tag:'p'},{n:'银行对账（流水核对）',tm:'上午',tag:'m'},{n:'销项税额与收入核对',tm:'下午',tag:'p'},{n:'第三方平台补开票核对',tm:'下午',tag:'m'},{n:'与报账员核对成本数据',tm:'全天',tag:''}];
+const REPORTS=[['指标明细表','综合部'],['营业额统计分析表','成本核算科'],['同期营业额统计表','管理一科'],['利得行应收统计表','财务部'],['科桥应收统计表','财务部'],['科桥空调应收表','财务部'],['异常问题汇总表','管理一科']];
+const KEY='hg_protoD';
+let state=load();
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{done:[]}}catch(e){return{done:[]}}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function tagCls(p){return p==='p'?'tag-p':p==='m'?'tag-m':''}
+function tagNm(p){return p==='p'?'紧急':p==='m'?'重要':''}
+function render(){
+  document.getElementById('todoList').innerHTML=TODAY.map((t,i)=>`
+    <div class="todo-item ${state.done.includes(i)?'done':''}" onclick="tog(${i})">
+      <input type="checkbox" ${state.done.includes(i)?'checked':''}>
+      <div class="nm">${t.n}</div>
+      <span class="tm">${t.tm}</span>
+      ${t.tag?`<span class="tag ${tagCls(t.tag)}">${tagNm(t.tag)}</span>`:''}
+    </div>`).join('');
+  document.getElementById('todoCnt').textContent=TODAY.length-state.done.length+' 项';
+  document.getElementById('kTodo').textContent=TODAY.length-state.done.length;
+  document.getElementById('doneCnt').textContent=state.done.length;
+  document.getElementById('doneList').innerHTML=TODAY.filter((_,i)=>state.done.includes(i)).map((t,i)=>`
+    <div class="todo-item done"><input type="checkbox" checked><div class="nm">${t.n}</div></div>`).join('');
+  document.getElementById('rptGrid').innerHTML=REPORTS.map(r=>`
+    <div class="rp"><div><div>${r[0]}</div><span class="dept">${r[1]}</span></div><span class="ok">✓</span></div>`).join('');
+}
+function tog(i){const k=state.done.indexOf(i);k>-1?state.done.splice(k,1):state.done.push(i);save();render()}
+function toggleDone(){document.getElementById('doneList').classList.toggle('open')}
+document.getElementById('navDate').textContent=new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+render();
+</script>
+</body>
+</html>

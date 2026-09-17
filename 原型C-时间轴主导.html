@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>浩哥工作台 · 原型C 时间轴主导</title>
+<style>
+:root{--pri:#2563eb;--pri-l:#eff6ff;--teal:#0d9488;--amber:#d97706;--green:#16a34a;--red:#dc2626;--slate:#64748b;--slate-l:#f1f5f9;--muted:#94a3b8;--bg:#f8fafc;--card:#fff;--radius:8px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:#334155;font-size:13px;line-height:1.5}
+.header{background:var(--card);padding:12px 16px;border-bottom:1px solid var(--slate-l);display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:15px;font-weight:600}
+.header .date{color:var(--muted);font-size:12px}
+.container{max-width:800px;margin:0 auto;padding:16px}
+
+/* 时间轴 */
+.timeline{position:relative;padding-left:28px}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--slate-l)}
+.tl-item{position:relative;margin-bottom:8px}
+.tl-dot{position:absolute;left:-24px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--slate-l);border:2px solid var(--muted)}
+.tl-dot.active{background:var(--pri);border-color:var(--pri);box-shadow:0 0 0 3px var(--pri-l)}
+.tl-dot.past{background:var(--green);border-color:var(--green)}
+.tl-content{background:var(--card);border-radius:var(--radius);border:1px solid var(--slate-l);padding:10px 12px}
+.tl-date{font-size:11px;color:var(--muted);margin-bottom:2px}
+.tl-task{font-size:12px}
+.tl-task .pri{font-size:9px;padding:1px 4px;border-radius:3px;margin-left:4px}
+.tl-today .tl-content{border-left:3px solid var(--pri);background:var(--pri-l)}
+.tl-today .tl-task{font-weight:500}
+
+/* 今日面板 */
+.today-panel{background:var(--card);border-radius:var(--radius);border:1px solid var(--slate-l);margin-bottom:16px;overflow:hidden}
+.today-head{background:var(--pri-l);color:var(--pri);padding:10px 14px;font-weight:600;font-size:13px;display:flex;align-items:center;gap:6px}
+.today-body{padding:10px 14px}
+.task-line{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid #f8fafc}
+.task-line:last-child{border-bottom:none}
+.task-line input{width:16px;height:16px;accent-color:var(--pri);margin-top:2px;cursor:pointer}
+.task-line .txt{flex:1;font-size:12px}
+.task-line .pri{font-size:10px;padding:1px 5px;border-radius:3px;white-space:nowrap}
+.task-line.done{opacity:.5}
+.task-line.done .txt{text-decoration:line-through}
+
+/* 右侧/下方信息 */
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.info-box{background:var(--card);border-radius:var(--radius);border:1px solid var(--slate-l);padding:10px;text-align:center}
+.info-box .num{font-size:18px;font-weight:700}
+.info-box .lbl{font-size:10px;color:var(--muted);margin-top:2px}
+.bar-bg{height:3px;background:var(--slate-l);border-radius:2px;margin-top:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:2px;transition:width .4s ease}
+
+/* 注意事项 */
+.notice-panel{background:var(--card);border-radius:var(--radius);border:1px solid var(--slate-l);margin-top:12px;padding:12px 14px}
+.notice-head{font-weight:600;font-size:13px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.notice-item{padding:6px 0;border-bottom:1px solid #f8fafc;font-size:11px}
+.notice-item:last-child{border-bottom:none}
+.notice-item strong{color:var(--red);font-size:12px}
+
+/* 快捷 */
+.quick{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.quick-btn{background:var(--slate-l);border:none;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;color:var(--slate)}
+.quick-btn:hover{background:var(--pri);color:#fff}
+
+/* 已办 */
+.done-bar{display:flex;align-items:center;gap:6px;padding:8px 0;cursor:pointer;color:var(--muted);font-size:12px;border-top:1px solid #f8fafc}
+.done-list{padding-left:16px;font-size:11px;color:var(--green);display:none}
+.done-list.open{display:block}
+
+.empty{color:var(--muted);font-size:11px;text-align:center;padding:12px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>浩哥 · 收入核算科</h1>
+  <div class="date" id="headerDate">--</div>
+</div>
+
+<div class="container">
+
+  <!-- 今日任务面板 -->
+  <div class="today-panel">
+    <div class="today-head"><span>📌</span> 今日待办 · <span id="todayNum">0</span>项</div>
+    <div class="today-body" id="taskBody"><div class="empty">加载中...</div></div>
+    <div class="today-body" style="padding-top:0">
+      <div class="done-bar" onclick="toggleDone()">
+        <span id="doneArrow">▶</span> 已完成事项 <span style="margin-left:auto" id="doneCount">0项</span>
+      </div>
+      <div class="done-list" id="doneList"></div>
+    </div>
+  </div>
+
+  <!-- 月度时间轴 -->
+  <div style="font-weight:600;font-size:13px;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+    <span>📅</span> 月度工作流时间轴
+  </div>
+  <div class="timeline" id="timeline"></div>
+
+  <!-- 底部信息区 -->
+  <div class="info-grid" style="margin-top:16px">
+    <div class="info-box">
+      <div class="num" style="color:var(--pri)" id="progNum">0/7</div>
+      <div class="lbl">月度报表</div>
+      <div class="bar-bg"><div class="bar-fill" id="progBar" style="background:var(--pri);width:0%"></div></div>
+    </div>
+    <div class="info-box">
+      <div class="num" style="color:var(--teal)" id="taxNum">0/6</div>
+      <div class="lbl">税务申报</div>
+      <div class="bar-bg"><div class="bar-fill" id="taxBar" style="background:var(--teal);width:0%"></div></div>
+    </div>
+    <div class="info-box" style="cursor:pointer;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;border:none" onclick="openExam()">
+      <div class="num" id="examDays">-</div>
+      <div class="lbl" style="color:#fff;opacity:.9">税务师三科</div>
+    </div>
+  </div>
+
+  <!-- 注意事项 -->
+  <div class="notice-panel">
+    <div class="notice-head"><span>⚡</span> 重点注意事项</div>
+    <div class="notice-item"><strong>借贷方向负数检查：</strong>核实是否有借贷方向为负数情况，如有及时纠正。</div>
+    <div class="notice-item"><strong>销项税额核对：</strong>先核对销项税额，后核对收入。</div>
+    <div class="notice-item"><strong>总账收入核对：</strong>餐饮收入 + 商品销售收入 + 其他服务收入。</div>
+    <div class="notice-item"><strong>第三方补开票：</strong>好哒、迅付、富友三家平台，剩余差额补开票。</div>
+    <div class="quick">
+      <button class="quick-btn">月度流程</button>
+      <button class="quick-btn">AI注意事项</button>
+      <button class="quick-btn">报表中心</button>
+      <button class="quick-btn">项目台账</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- 考试弹窗 -->
+<div id="examModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center" onclick="closeExam(event)">
+  <div style="background:#fff;border-radius:12px;padding:24px;max-width:360px;width:85%" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <strong>全部考试倒计时</strong>
+      <button onclick="closeExam()" style="background:none;border:none;cursor:pointer;font-size:18px">×</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="background:#7c3aed;color:#fff;border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:26px;font-weight:800" id="modalJingji">-</div>
+        <div style="font-size:12px">中级经济师 · 11月7-8日</div>
+      </div>
+      <div style="background:#0d9488;color:#fff;border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:26px;font-weight:800" id="modalShuiwu">-</div>
+        <div style="font-size:12px">税务师三科 · 11月14-15日</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const MONTHLY_TASKS = [
+  {day:1,tasks:[{t:'完成上月31日银行回单录入',pri:'high'},{t:'开始银行对账',pri:'high'},{t:'催促自然月结算项目提交报表和收款计划',pri:'high'}]},
+  {day:2,tasks:[{t:'核对各项目报表数据一致性',pri:'high'},{t:'完成科桥餐饮公司各项指标明细',pri:'high'},{t:'根据上表完成成本费用计算',pri:'high'}]},
+  {day:3,tasks:[{t:'完成营业额统计分析表',pri:'high'},{t:'完成同期营业额统计分析表',pri:'high'}]},
+  {day:4,tasks:[{t:'完成异常问题分类分工汇总',pri:'high'},{t:'完成三个应收账款统计表',pri:'high'}]},
+  {day:5,tasks:[{t:'将应收账龄分析表发给各项目',pri:'mid'},{t:'核对应收账款明细',pri:'mid'},{t:'【截止5号前】完成3家统计报表报送',pri:'high'},{t:'【截止5号前】完成2家税金预估报送',pri:'high'}]},
+  {day:9,tasks:[{t:'【截止10号前】7家公司税务和个税申报',pri:'high'},{t:'申报后填写税金缴纳确认表',pri:'high'}]},
+  {day:10,tasks:[{t:'【截止今日】税务申报最后一天',pri:'high'},{t:'确认税金缴纳确认表已填写',pri:'high'}]},
+  {day:11,tasks:[{t:'第三方收款项目次月补开票跟进',pri:'mid'}]},
+  {day:20,tasks:[{t:'装订上月凭证',pri:'mid'}]},
+  {day:26,tasks:[{t:'开始催25日核算项目提交报表',pri:'high'}]},
+  {day:30,tasks:[{t:'核对销项税额与开票系统一致',pri:'high'},{t:'核实借贷方向负数情况',pri:'high'},{t:'核对总账收入与开票系统一致',pri:'high'},{t:'19家公司扎口平账',pri:'high'}]}
+];
+const STORAGE_KEY = 'haoge_prototype_c';
+let state = {tasks:{}};
+try{ const raw = localStorage.getItem(STORAGE_KEY); if(raw) state = JSON.parse(raw); }catch(e){}
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+function getToday(){ return new Date().getDate(); }
+function render(){
+  const today = getToday();
+  document.getElementById('headerDate').textContent = new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'short'});
+
+  // 今日任务
+  const container = document.getElementById('taskBody');
+  const doneList = document.getElementById('doneList');
+  const doneCount = document.getElementById('doneCount');
+  const dayData = MONTHLY_TASKS.find(d => d.day === today);
+  if(!dayData){ container.innerHTML = '<div class="empty">今日无特定日期任务，执行每日常规工作</div>'; doneCount.textContent='0项'; }
+  else {
+    container.innerHTML = ''; doneList.innerHTML = '';
+    let todo=0,done=0;
+    const priMap={high:'高',mid:'中',low:'低'};
+    dayData.tasks.forEach((task,i)=>{
+      const key='d'+today+'_'+i;
+      const isDone=state.tasks[key];
+      const div=document.createElement('div');
+      div.className='task-line'+(isDone?' done':'');
+      div.innerHTML=`<input type="checkbox" ${isDone?'checked':''} onchange="toggle('${key}')"><span class="txt">${task.t}</span><span class="pri" style="background:${task.pri==='high'?'#fee2e2':task.pri==='mid'?'#fef3c7':'#e0e7ff'};color:${task.pri==='high'?'#991b1b':task.pri==='mid'?'#92400e':'#3730a3'}">${priMap[task.pri]}</span>`;
+      if(isDone){div.style.display='none';doneList.innerHTML+=`<div style="padding:2px 0">✓ ${task.t}</div>`;done++;}
+      else todo++;
+      container.appendChild(div);
+    });
+    doneCount.textContent=done+'项';
+    document.getElementById('todayNum').textContent=todo;
+  }
+
+  // 时间轴
+  const tl = document.getElementById('timeline');
+  tl.innerHTML = '';
+  MONTHLY_TASKS.forEach(d => {
+    const isToday = d.day === today;
+    const isPast = d.day < today;
+    const item = document.createElement('div');
+    item.className = 'tl-item' + (isToday ? ' tl-today' : '');
+    item.innerHTML = `
+      <div class="tl-dot ${isToday?'active':isPast?'past':''}"></div>
+      <div class="tl-content">
+        <div class="tl-date">${d.day}日${isToday?' · 今天':''}</div>
+        ${d.tasks.map(t=>`<div class="tl-task">${t.t}${isToday?'<span class="pri" style="background:'+(t.pri==='high'?'#fee2e2':t.pri==='mid'?'#fef3c7':'#e0e7ff')+';color:'+(t.pri==='high'?'#991b1b':t.pri==='mid'?'#92400e':'#3730a3')+'">'+(t.pri==='high'?'高':t.pri==='mid'?'中':'低')+'</span>':''}</div>`).join('')}
+      </div>
+    `;
+    tl.appendChild(item);
+  });
+
+  // 考试倒计时
+  const shuiwu=new Date('2026-11-14');
+  const days=Math.ceil((shuiwu-new Date())/(1000*60*60*24));
+  document.getElementById('examDays').textContent=days>0?days+'天':'已结束';
+}
+function toggle(key){state.tasks[key]=!state.tasks[key];save();render();}
+function toggleDone(){
+  const list=document.getElementById('doneList');
+  const arrow=document.getElementById('doneArrow');
+  const open=list.classList.toggle('open');
+  arrow.textContent=open?'▼':'▶';
+}
+function openExam(){
+  document.getElementById('examModal').style.display='flex';
+  const now=new Date();
+  const toDays=(d)=>{const n=Math.ceil((d-now)/(1000*60*60*24));return n>0?n+'天':'已结束';};
+  document.getElementById('modalJingji').textContent=toDays(new Date('2026-11-07'));
+  document.getElementById('modalShuiwu').textContent=toDays(new Date('2026-11-14'));
+}
+function closeExam(e){if(e&&e.target!==e.currentTarget)return;document.getElementById('examModal').style.display='none';}
+render();
+</script>
+
+</body>
+</html>

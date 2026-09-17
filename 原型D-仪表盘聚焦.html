@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>浩哥工作台 · 原型D 仪表盘聚焦</title>
+<style>
+:root{--pri:#2563eb;--pri-l:#eff6ff;--teal:#0d9488;--amber:#d97706;--green:#16a34a;--red:#dc2626;--slate:#64748b;--slate-l:#f1f5f9;--muted:#94a3b8;--bg:#f8fafc;--card:#fff;--radius:10px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:#334155;font-size:13px;line-height:1.5}
+.header{background:var(--card);padding:14px 16px;border-bottom:1px solid var(--slate-l);display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:15px;font-weight:600}
+.header .date{color:var(--muted);font-size:12px}
+.container{max-width:800px;margin:0 auto;padding:16px}
+
+/* 顶部统计区 */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.stat-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--slate-l);padding:14px;text-align:center}
+.stat-card .value{font-size:24px;font-weight:800}
+.stat-card .label{font-size:10px;color:var(--muted);margin-top:2px}
+.stat-card .sub{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* 今日任务区 - 占据最大面积 */
+.main-section{background:var(--card);border-radius:var(--radius);border:1px solid var(--slate-l);margin-bottom:12px;overflow:hidden}
+.main-head{background:var(--pri-l);color:var(--pri);padding:12px 16px;font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px}
+.main-head .count{background:var(--pri);color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:auto}
+.main-body{padding:12px 16px}
+
+.task-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #f8fafc}
+.task-item:last-child{border-bottom:none}
+.task-item input{width:18px;height:18px;accent-color:var(--pri);margin-top:1px;flex-shrink:0;cursor:pointer}
+.task-item .text{flex:1;font-size:13px}
+.task-item .pri{font-size:10px;padding:2px 6px;border-radius:3px;white-space:nowrap}
+.task-item.done{opacity:.5}
+.task-item.done .text{text-decoration:line-through}
+
+/* 折叠已办 */
+.done-toggle{display:flex;align-items:center;gap:6px;padding:10px 0;cursor:pointer;color:var(--muted);font-size:12px;border-top:1px solid #f8fafc;margin-top:4px}
+.done-list{padding-left:20px;font-size:11px;color:var(--green);display:none}
+.done-list.open{display:block}
+
+/* 底部双栏 */
+.bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sub-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--slate-l);padding:12px 14px}
+.sub-head{font-weight:600;font-size:12px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.notice-line{padding:6px 0;border-bottom:1px solid #f8fafc;font-size:11px;line-height:1.5}
+.notice-line:last-child{border-bottom:none}
+.notice-line strong{color:var(--red);font-size:12px}
+
+.quick-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.quick-btn{background:var(--slate-l);border:none;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;color:var(--slate)}
+.quick-btn:hover{background:var(--pri);color:#fff}
+
+/* 考试小卡片 */
+.exam-mini{background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;border-radius:var(--radius);padding:10px 14px;text-align:center;cursor:pointer}
+.exam-mini .num{font-size:20px;font-weight:800}
+.exam-mini .lbl{font-size:10px;opacity:.9}
+
+.empty{color:var(--muted);font-size:11px;text-align:center;padding:12px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>浩哥 · 收入核算科</h1>
+  <div class="date" id="headerDate">--</div>
+</div>
+
+<div class="container">
+
+  <!-- 顶部四指标 -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="value" style="color:var(--pri)" id="todayCount">-</div>
+      <div class="label">今日待办</div>
+      <div class="sub" id="todayDate">--</div>
+    </div>
+    <div class="stat-card">
+      <div class="value" style="color:var(--pri)" id="progNum">0/7</div>
+      <div class="label">月度报表</div>
+      <div class="sub">截止3号前</div>
+    </div>
+    <div class="stat-card">
+      <div class="value" style="color:var(--teal)" id="taxNum">0/6</div>
+      <div class="label">税务申报</div>
+      <div class="sub">截止10号前</div>
+    </div>
+    <div class="stat-card exam-mini" onclick="openExam()">
+      <div class="num" id="examDays">-</div>
+      <div class="lbl">税务师三科 11.14</div>
+    </div>
+  </div>
+
+  <!-- 主体：今日待办（最大面积） -->
+  <div class="main-section">
+    <div class="main-head">
+      <span>📌</span> 今日待办
+      <span class="count" id="todoCount">0</span>
+    </div>
+    <div class="main-body" id="taskBody"><div class="empty">加载中...</div></div>
+    <div class="main-body" style="padding-top:0">
+      <div class="done-toggle" onclick="toggleDone()">
+        <span id="doneArrow">▶</span>
+        <span>已完成事项</span>
+        <span style="margin-left:auto" id="doneCount">0项</span>
+      </div>
+      <div class="done-list" id="doneList"></div>
+    </div>
+  </div>
+
+  <!-- 底部双栏 -->
+  <div class="bottom-grid">
+    <div class="sub-card">
+      <div class="sub-head"><span>⚡</span> 重点注意事项</div>
+      <div class="notice-line"><strong>借贷方向负数检查：</strong>核实是否有借贷方向为负数情况，如有及时纠正。</div>
+      <div class="notice-line"><strong>销项税额核对：</strong>先核对销项税额，后核对收入。</div>
+      <div class="notice-line"><strong>总账收入核对：</strong>餐饮收入 + 商品销售收入 + 其他服务收入。</div>
+      <div class="notice-line"><strong>第三方补开票：</strong>好哒、迅付、富友三家平台，剩余差额补开票。</div>
+    </div>
+    <div class="sub-card">
+      <div class="sub-head"><span>🚀</span> 快捷操作</div>
+      <div class="quick-btns">
+        <button class="quick-btn">月度流程</button>
+        <button class="quick-btn">AI注意事项</button>
+        <button class="quick-btn">报表中心</button>
+        <button class="quick-btn">项目台账</button>
+        <button class="quick-btn">流程图</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 考试弹窗 -->
+<div id="examModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center" onclick="closeExam(event)">
+  <div style="background:#fff;border-radius:12px;padding:24px;max-width:360px;width:85%" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <strong>全部考试倒计时</strong>
+      <button onclick="closeExam()" style="background:none;border:none;cursor:pointer;font-size:18px">×</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="background:#7c3aed;color:#fff;border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:26px;font-weight:800" id="modalJingji">-</div>
+        <div style="font-size:12px">中级经济师 · 11月7-8日</div>
+      </div>
+      <div style="background:#0d9488;color:#fff;border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:26px;font-weight:800" id="modalShuiwu">-</div>
+        <div style="font-size:12px">税务师三科 · 11月14-15日</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const MONTHLY_TASKS = [
+  {day:1,tasks:[{t:'完成上月31日银行回单录入',pri:'high'},{t:'开始银行对账',pri:'high'},{t:'催促自然月结算项目提交报表和收款计划',pri:'high'}]},
+  {day:2,tasks:[{t:'核对各项目报表数据一致性',pri:'high'},{t:'完成科桥餐饮公司各项指标明细',pri:'high'},{t:'根据上表完成成本费用计算',pri:'high'}]},
+  {day:3,tasks:[{t:'完成营业额统计分析表',pri:'high'},{t:'完成同期营业额统计分析表',pri:'high'}]},
+  {day:4,tasks:[{t:'完成异常问题分类分工汇总',pri:'high'},{t:'完成三个应收账款统计表',pri:'high'}]},
+  {day:5,tasks:[{t:'将应收账龄分析表发给各项目',pri:'mid'},{t:'核对应收账款明细',pri:'mid'},{t:'【截止5号前】完成3家统计报表报送',pri:'high'},{t:'【截止5号前】完成2家税金预估报送',pri:'high'}]},
+  {day:6,tasks:[{t:'催项目提交签字版报表',pri:'mid'}]},
+  {day:7,tasks:[{t:'催项目提交签字版报表（最后一天）',pri:'mid'},{t:'【截止8号前】第三方平台补开票提醒',pri:'high'}]},
+  {day:8,tasks:[{t:'【截止今日】第三方平台补开票最后提醒',pri:'high'}]},
+  {day:9,tasks:[{t:'【截止10号前】7家公司税务和个税申报',pri:'high'},{t:'申报后填写税金缴纳确认表',pri:'high'}]},
+  {day:10,tasks:[{t:'【截止今日】税务申报最后一天',pri:'high'},{t:'确认税金缴纳确认表已填写',pri:'high'}]},
+  {day:11,tasks:[{t:'第三方收款项目次月补开票跟进',pri:'mid'}]},
+  {day:30,tasks:[{t:'核对销项税额与开票系统一致',pri:'high'},{t:'核实借贷方向负数情况',pri:'high'},{t:'核对总账收入与开票系统一致',pri:'high'},{t:'19家公司扎口平账',pri:'high'}]}
+];
+const STORAGE_KEY = 'haoge_prototype_d';
+let state = {tasks:{}};
+try{ const raw = localStorage.getItem(STORAGE_KEY); if(raw) state = JSON.parse(raw); }catch(e){}
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+function getToday(){ return new Date().getDate(); }
+function render(){
+  const today = getToday();
+  document.getElementById('headerDate').textContent = new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'short'});
+  document.getElementById('todayDate').textContent = today + '日';
+
+  const container = document.getElementById('taskBody');
+  const doneList = document.getElementById('doneList');
+  const doneCount = document.getElementById('doneCount');
+  const dayData = MONTHLY_TASKS.find(d => d.day === today);
+
+  if(!dayData){
+    container.innerHTML = '<div class="empty">今日无特定日期任务，执行每日常规工作</div>';
+    document.getElementById('todayCount').textContent = '-';
+    document.getElementById('todoCount').textContent = '0';
+    doneCount.textContent = '0项';
+    return;
+  }
+
+  container.innerHTML = '';
+  doneList.innerHTML = '';
+  let todo=0,done=0;
+  const priMap={high:'高',mid:'中',low:'低'};
+  dayData.tasks.forEach((task,i)=>{
+    const key='d'+today+'_'+i;
+    const isDone=state.tasks[key];
+    const div=document.createElement('div');
+    div.className='task-item'+(isDone?' done':'');
+    div.innerHTML=`<input type="checkbox" ${isDone?'checked':''} onchange="toggle('${key}')"><span class="text">${task.t}</span><span class="pri" style="background:${task.pri==='high'?'#fee2e2':task.pri==='mid'?'#fef3c7':'#e0e7ff'};color:${task.pri==='high'?'#991b1b':task.pri==='mid'?'#92400e':'#3730a3'}">${priMap[task.pri]}</span>`;
+    if(isDone){div.style.display='none';doneList.innerHTML+=`<div style="padding:2px 0">✓ ${task.t}</div>`;done++;}
+    else todo++;
+    container.appendChild(div);
+  });
+  doneCount.textContent=done+'项';
+  document.getElementById('todayCount').textContent=todo;
+  document.getElementById('todoCount').textContent=todo;
+
+  const shuiwu=new Date('2026-11-14');
+  const days=Math.ceil((shuiwu-new Date())/(1000*60*60*24));
+  document.getElementById('examDays').textContent=days>0?days+'天':'已结束';
+}
+function toggle(key){state.tasks[key]=!state.tasks[key];save();render();}
+function toggleDone(){
+  const list=document.getElementById('doneList');
+  const arrow=document.getElementById('doneArrow');
+  const open=list.classList.toggle('open');
+  arrow.textContent=open?'▼':'▶';
+}
+function openExam(){
+  document.getElementById('examModal').style.display='flex';
+  const now=new Date();
+  const toDays=(d)=>{const n=Math.ceil((d-now)/(1000*60*60*24));return n>0?n+'天':'已结束';};
+  document.getElementById('modalJingji').textContent=toDays(new Date('2026-11-07'));
+  document.getElementById('modalShuiwu').textContent=toDays(new Date('2026-11-14'));
+}
+function closeExam(e){if(e&&e.target!==e.currentTarget)return;document.getElementById('examModal').style.display='none';}
+render();
+</script>
+
+</body>
+</html>

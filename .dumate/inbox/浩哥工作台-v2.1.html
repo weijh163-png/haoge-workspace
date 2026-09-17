@@ -494,13 +494,13 @@ dialog.work-dialog{border:1px solid var(--border);border-radius:10px;padding:26p
 
 <nav class="nav-bar">
   <div class="nav-brand">浩哥工作台 <span>收入核算科 v2</span></div>
-  <div class="nav-tabs" role="tablist" aria-label="工作台模块">
-    <button type="button" class="nav-tab active" id="nav-dashboard" role="tab" aria-selected="true" aria-controls="dashboard" onclick="switchTab('dashboard')">首页 · 今日</button>
-    <button type="button" class="nav-tab" id="nav-workflow" role="tab" aria-selected="false" aria-controls="workflow" onclick="switchTab('workflow')">月度工作流程</button>
-    <button type="button" class="nav-tab" id="nav-reports" role="tab" aria-selected="false" aria-controls="reports" onclick="switchTab('reports')">报表 &amp; AI</button>
-    <button type="button" class="nav-tab" id="nav-projects" role="tab" aria-selected="false" aria-controls="projects" onclick="switchTab('projects')">项目台账</button>
-    <button type="button" class="nav-tab" id="nav-flowchart" role="tab" aria-selected="false" aria-controls="flowchart" onclick="switchTab('flowchart')">流程图与复盘</button>
-    <button type="button" class="nav-tab" id="nav-extra" role="tab" aria-selected="false" aria-controls="extra" onclick="switchTab('extra')">扎口与未了</button>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="switchTab('dashboard')">首页 · 今日</div>
+    <div class="nav-tab" onclick="switchTab('workflow')">月度工作流程</div>
+    <div class="nav-tab" onclick="switchTab('reports')">报表 &amp; AI</div>
+    <div class="nav-tab" onclick="switchTab('projects')">项目台账</div>
+    <div class="nav-tab" onclick="switchTab('flowchart')">流程图与复盘</div>
+    <div class="nav-tab" onclick="switchTab('extra')">扎口与未了</div>
   </div>
 <button class="text-button nav-backup" onclick="openBackupDialog()">备份</button>
 </nav>
@@ -609,21 +609,20 @@ dialog.work-dialog{border:1px solid var(--border);border-radius:10px;padding:26p
 </section>
 
 <!-- ==================== Module 4: Reports ==================== -->
-<section class="module work-module" id="reports" role="tabpanel" aria-labelledby="nav-reports">
-  <div class="report-subnav" role="tablist" aria-label="报表与 AI 内容"><button type="button" class="report-subtab active" role="tab" aria-selected="true" data-report-subtab="progress" onclick="setReportSubtab('progress')">报表进度</button><button type="button" class="report-subtab" role="tab" aria-selected="false" data-report-subtab="rules" onclick="setReportSubtab('rules')">AI 核对规则</button><button type="button" class="report-subtab" role="tab" aria-selected="false" data-report-subtab="tax" onclick="setReportSubtab('tax')">税务申报</button></div>
-  <header class="module-heading report-subpane" data-report-pane="progress"><h1>报表自动化</h1><p>七份月报，明确下一步。工作台记录进度，AI 在外部软件办理，复核与提交分别确认。</p></header>
-  <div class="card report-overview report-subpane" data-report-pane="progress"><div class="card-title">本期报表</div><p class="section-hint">原交接节点：每月3号前提交 · 交复核人复核。工作月份与报表所属期请按实际资料确认。</p><div id="reportCardsList"></div></div>
-  <div class="card report-subpane" data-report-pane="progress" id="exceptionGuide"><div class="card-title">异常情况说明 · 核心提醒与 AI 办理</div>
+<section class="module work-module" id="reports">
+  <header class="module-heading"><h1>报表自动化</h1><p>七份月报，明确下一步。工作台记录进度，AI 在外部软件办理，复核与提交分别确认。</p></header>
+  <div class="card report-overview"><div class="card-title">本期报表</div><p class="section-hint">原交接节点：每月3号前提交 · 交复核人复核。工作月份与报表所属期请按实际资料确认。</p><div id="reportCardsList"></div></div>
+  <div class="card" id="exceptionGuide"><div class="card-title">异常情况说明 · 核心提醒与 AI 办理</div>
     <ul class="core-points"><li>核对所属月份与对比年份；分别查看当月、累计数据，不能互相代用。</li><li>按项目编码核对营业额、代扣款、差额营业额和增减方向。差额营业额＝营业额－代扣款。</li><li>金额统一为万元、保留两位小数。缺失数据标记待补充，不能按零填写。</li><li>保留特殊项目口径：CF251、CF450 仅在累计表填列；其他项目按原有核算规则核对。</li><li>原因必须有实际资料依据。不明确时写“待项目确认”，AI 草稿经人工复核后再定稿。</li></ul>
     <div class="ai-action-row"><button class="btn btn-pri" onclick="openAIHandoff()">去 AI 处理</button><button class="btn btn-outline" onclick="copyAITask()">复制任务要求</button><button class="text-button" onclick="openAISettings()">设置软件入口</button><span class="ai-status" id="aiConfigStatus"></span></div>
     <p class="section-hint" style="margin:14px 0 0">只提供办理入口，不在本页导入或计算财务数据；不会自动上传资料，也不会把打开软件记作已完成。</p>
   </div>
-  <div class="card report-subpane" data-report-pane="progress" id="checklistSection"><div class="card-title">提交前检查</div><div id="reportChecklist"></div><p class="section-hint">按所选月份保存。签字版本催收等后续环节独立保留，不冒充提交前已完成。</p></div>
+  <div class="card" id="checklistSection"><div class="card-title">提交前检查</div><div id="reportChecklist"></div><p class="section-hint">按所选月份保存。签字版本催收等后续环节独立保留，不冒充提交前已完成。</p></div>
 </section>
 
 <!-- ==================== Module 3: AI Assistant ==================== -->
 <section class="module work-module" id="assistant">
-  <header class="module-banner" id="reportPaneRules" data-report-pane="rules">
+  <header class="module-banner">
     <div class="module-banner-copy">
       <span class="module-banner-label">WORKING RULES</span>
       <h1>AI 辅助系统</h1>
@@ -635,14 +634,14 @@ dialog.work-dialog{border:1px solid var(--border);border-radius:10px;padding:26p
       <div class="module-keyfact"><b>10 号</b><span>申报节点</span></div>
     </div>
   </header>
-  <div class="card manual-section" data-report-pane="rules">
+  <div class="card manual-section">
 <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px"><span><span class="ico">🤖</span> AI自动化辅助系统 · 操作注意事项手册</span><button type="button" class="text-button" onclick="toggleAllNotices()" title="一键展开/收起全部注意事项">一键展开</button></div>
     <div class="section-hint">收入核算日常操作13条核心注意事项。这些规则覆盖制单、开票、核对、红冲等高频场景。</div>
     <div id="noticeList"></div>
   </div>
 
   <!-- Tax Declaration -->
-  <div class="card tax-section" id="taxSection" data-report-pane="tax">
+  <div class="card tax-section" id="taxSection">
     <div class="card-title"><span class="ico">🏢</span> 税务申报指引（7家公司）</div>
     <div class="section-hint">每月10号前完成 · 先申报个税再申报税务 · 完成后同步填写2张表+税金缴纳确认表</div>
 
@@ -674,7 +673,7 @@ dialog.work-dialog{border:1px solid var(--border);border-radius:10px;padding:26p
   </div>
 
   <!-- Special Operations -->
-  <details class="card special-section" data-report-pane="rules">
+  <details class="card special-section">
     <summary class="card-title">特殊操作 · 完整步骤参考</summary>
 
     <div class="routine-card">
@@ -1261,7 +1260,7 @@ const REPORTS = [
 // ==================== State ====================
 const STORAGE_KEY = 'haoge_workspace_v3';
 const LEGACY_STORAGE_KEY = 'haoge_workspace_v2';
-const MONTH_FIELDS = ['tasks','reports','tax','reportWorkflow','reportEvidence','checklist','projects','zakou','stats'];
+const MONTH_FIELDS = ['tasks','reports','tax','reportWorkflow','checklist','projects','zakou','stats'];
 function localDate(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function isPeriod(s){return typeof s==='string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(s);}
 function isRecord(v){return !!v && typeof v==='object' && !Array.isArray(v);}
@@ -1361,30 +1360,16 @@ function openBackupDialog(){document.getElementById('backupDialog').showModal();
 window.addEventListener('beforeunload',e=>{if(storageDirty){e.preventDefault();e.returnValue='';}});
 
 // ==================== Navigation ====================
-const MAIN_TABS = ['dashboard','workflow','reports','projects','flowchart','extra'];
-function switchTab(name,options={}){
-  document.querySelectorAll('.nav-tab').forEach((tab,index) => {
-    const selected=MAIN_TABS[index]===name;
-    tab.classList.toggle('active',selected);
-    tab.setAttribute('aria-selected',String(selected));
-    tab.tabIndex=selected?0:-1;
+function switchTab(name){
+  const tabs = ['dashboard','workflow','reports','projects','flowchart','extra'];
+  document.querySelectorAll('.nav-tab').forEach((t,i) => {
+    t.classList.remove('active');
+    if(tabs[i] === name) t.classList.add('active');
   });
-  document.querySelectorAll('.module').forEach(module => {
-    module.classList.toggle('active',module.id===name||(name==='reports'&&module.id==='assistant'));
+  document.querySelectorAll('.module').forEach(m => {
+    m.classList.remove('active');
+    if(m.id === name || (name === 'reports' && m.id === 'assistant')) m.classList.add('active');
   });
-  if(name==='reports')setReportSubtab(options.reportPane||'progress',false);
-}
-function setReportSubtab(pane,moveToTop=true){
-  const allowed=['progress','rules','tax'];
-  if(!allowed.includes(pane))return;
-  document.querySelectorAll('[data-report-pane]').forEach(section=>{section.hidden=section.dataset.reportPane!==pane;});
-  document.querySelectorAll('[data-report-subtab]').forEach(tab=>{
-    const selected=tab.dataset.reportSubtab===pane;
-    tab.classList.toggle('active',selected);
-    tab.setAttribute('aria-selected',String(selected));
-    tab.tabIndex=selected?0:-1;
-  });
-  if(moveToTop)document.getElementById('reports')?.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 // ==================== Date & Today ====================
@@ -1403,9 +1388,7 @@ function updateDateDisplay(){
   document.getElementById('examMiniText').textContent=remaining>0?`还有 ${remaining} 天 · 11月14–15日`:remaining>=-1?'考试期间 · 查看安排':'考试日期已过 · 查看安排';
   const day=currentWorkDay(),phases=[['交报表','1–4日',day<=4],['统计申报','5–10日',day>4&&day<=10],['月中跟进','11–25日',day>10&&day<=25],['月末收口','26日–月底',day>25]];
   document.getElementById('rhythmStages').innerHTML=phases.map(p=>`<button class="rhythm-stage${live&&p[2]?' current':''}" onclick="switchTab('workflow')"><strong>${p[0]}</strong><span>${p[1]}${live&&p[2]?' · 当前阶段':''}</span></button>`).join('');
-  const mf=document.getElementById('monthFocusText'),focus=(state.monthFocus||{})[state.activePeriod]||[],focusBox=document.getElementById('monthFocusBox');
-  if(focusBox)focusBox.classList.toggle('is-compact',!focus.length);
-  if(mf)mf.innerHTML=focus.length?focus.map(s=>`<span style="display:block;padding:4px 0">• ${escapeHTML(s)}</span>`).join(''):'<span>暂未设置重点 · 点击编辑添加</span>';
+  const mf=document.getElementById('monthFocusText');if(mf){const focus=(state.monthFocus||{})[state.activePeriod]||[];mf.innerHTML=focus.length?focus.map(s=>`<span style="display:block;padding:4px 0">• ${escapeHTML(s)}</span>`).join(''):'<span style="color:var(--muted)">本月暂无重点提醒，点击下方编辑添加。</span>';}
 }
 function editMonthFocus(){const text=prompt('编辑本月重点（每行一条）：',((state.monthFocus||{})[state.activePeriod]||[]).join('\n'));if(text===null)return;if(!state.monthFocus)state.monthFocus={};state.monthFocus[state.activePeriod]=text.split('\n').map(s=>s.trim()).filter(s=>s);saveData();updateDateDisplay();showToast('本月重点已保存');}
 const DAILY_ROUTINES=[{t:'核对银行回单',detail:'核对到账项目与收款金额',time:'每天'},{t:'统一开票制单',detail:'检查开票申请、应收单与跨期收入',time:'15:00'},{t:'跟进第三方补开票',detail:'按实际缺失资料提前催办',time:'每天'}];
@@ -1453,11 +1436,10 @@ function toggleTaskForPeriod(period,key){
 }
 function toggleDayTask(key){toggleTaskForPeriod(state.activePeriod,key);}
 function renderFollowups(){
-  const list=[...getProjectFollowups(),...getUnresolvedFollowups(),...getReportEvidenceFollowups()];
+  const list=[...getProjectFollowups(),...getUnresolvedFollowups()];
   list.sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
   document.getElementById('followupCount').textContent=list.length+' 项';
-  const surface=document.querySelector('.followup-surface');if(surface)surface.classList.toggle('is-empty',list.length===0);
-  document.getElementById('followupList').innerHTML=list.slice(0,4).map(item=>{const action=item.source==='extra'?"switchTab('extra')":item.source==='report'?`openReportWorkspace(${item.id})`:`openProjectDetail('${item.code}')`;return `<div class="followup-row"><strong>${escapeHTML(item.name)}</strong><p>${escapeHTML(item.detail||'待补充跟进说明')}</p><small>${escapeHTML(item.date?item.date+(item.date<localDate()?' · 待跟进':''):'未设跟进日期')}${item.contact?' · '+escapeHTML(item.contact):''}</small><button class="text-button" onclick="${action}">记录跟进</button></div>`;}).join('')||'<div class="empty-state empty-followup"><strong>当前无待催办</strong><span>项目、历史未了和已启动报表均未记录待跟进事项。</span></div>';
+  document.getElementById('followupList').innerHTML=list.slice(0,4).map(item=>`<div class="followup-row"><strong>${escapeHTML(item.name)}</strong><p>${escapeHTML(item.detail||'待补充跟进说明')}</p><small>${escapeHTML(item.date?item.date+(item.date<localDate()?' · 待跟进':''):'未设跟进日期')}${item.contact?' · '+escapeHTML(item.contact):''}</small><button class="text-button" onclick="${item.source==='extra'?"switchTab('extra')":"openProjectDetail('"+item.code+"')"}">记录跟进</button></div>`).join('')||'<div class="empty-state">暂未记录待催办事项。<br>在项目详情中标记“待资料”，或在未了事项中设置跟进日期，即会在这里显示。</div>';
   if(list.length>4)document.getElementById('followupList').innerHTML+='<p class="section-hint">另有 '+(list.length-4)+' 项，请进入对应模块查看。</p>';
 }
 function monthlyMilestones(){
@@ -1518,20 +1500,14 @@ function closeExamModal(e){
 }
 
 const REPORT_WORKFLOW_STAGES={prepare:{label:'待资料',hint:'补齐资料与口径'},drafting:{label:'编制中',hint:'编制并核对数据'},review:{label:'待复核',hint:'交复核人复核'},reviewed:{label:'已复核',hint:'确认报送版本'},submitted:{label:'已提交',hint:'留存提交记录'}};
-const REPORT_EVIDENCE_FIELDS=[{key:'source',label:'数据源已更新',hint:'已取得并确认本期数据源'},{key:'formula',label:'公式核验通过',hint:'导入、汇总与关键公式已核对'},{key:'review',label:'复核留痕已保存',hint:'复核意见或报送依据已留存'}];
 function getReportWorkflowStage(id){const s=state.reportWorkflow[id];return Object.hasOwn(REPORT_WORKFLOW_STAGES,s)?s:'prepare';}
 function getReportShortName(r){return r.name.replace('科桥餐饮公司','餐饮').replace('科桥餐饮项目','餐饮项目');}
-function getReportEvidence(id){const value=state.reportEvidence?.[id];return isRecord(value)?value:{source:false,formula:false,review:false,sourceAt:'',formulaAt:'',reviewAt:''};}
-function evidenceTime(value){if(!value)return '待记录';const date=new Date(value);return Number.isNaN(date.valueOf())?'已记录':'记录于 '+date.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});}
-function toggleReportEvidence(id,key,checked){if(!REPORTS.some(r=>r.id===id)||!REPORT_EVIDENCE_FIELDS.some(field=>field.key===key))return;const evidence={...getReportEvidence(id),[key]:!!checked,[key+'At']:checked?new Date().toISOString():''};state.reportEvidence[id]=evidence;if(saveData()){refreshWorkspace();const card=document.getElementById('reportCard'+id);if(card)card.open=true;}}
-function getReportEvidenceFollowups(){const rank={prepare:0,drafting:1,review:2,reviewed:3,submitted:4};return REPORTS.flatMap(report=>{const stage=getReportWorkflowStage(report.id),level=rank[stage],evidence=getReportEvidence(report.id),required=REPORT_EVIDENCE_FIELDS.filter(field=>field.key==='review'?level>=2:level>=1);return required.filter(field=>!evidence[field.key]).map(field=>({name:'报表核验 · '+getReportShortName(report),detail:'缺少“'+field.label+'”记录',date:'',source:'report',id:report.id}));});}
-function reportEvidenceSummary(id){const evidence=getReportEvidence(id),done=REPORT_EVIDENCE_FIELDS.filter(field=>evidence[field.key]).length;return done+'/'+REPORT_EVIDENCE_FIELDS.length+' 项已留痕';}
 function renderReportCards(){
-    document.getElementById('reportCardsList').innerHTML=REPORTS.map(r=>{const s=getReportWorkflowStage(r.id),m=REPORT_WORKFLOW_STAGES[s],evidence=getReportEvidence(r.id);return `<details class="report-row" id="reportCard${r.id}"><summary><div><h3>${r.id}. ${escapeHTML(getReportShortName(r))}</h3><small>报送：${escapeHTML(r.recipient)}</small></div><span class="status-pill ${s}">${m.label}</span><small>下一步：${m.hint}</small></summary><div class="report-details"><p>${escapeHTML(r.desc)}</p><div class="report-controls"><label>实际处理阶段 <select onchange="setReportStage(${r.id},this.value)">${Object.entries(REPORT_WORKFLOW_STAGES).map(([k,v])=>`<option value="${k}" ${k===s?'selected':''}>${v.label}</option>`).join('')}</select></label><button class="btn btn-outline btn-sm" onclick="openAIHandoff(${r.id})">去 AI 办理</button><button class="text-button" onclick="document.getElementById('checklistSection').scrollIntoView({behavior:'smooth'})">检查要点</button></div><fieldset class="report-evidence"><legend>自动化核验记录 <span>${reportEvidenceSummary(r.id)}</span></legend>${REPORT_EVIDENCE_FIELDS.map(field=>`<label class="report-evidence-item${evidence[field.key]?' is-complete':''}"><input type="checkbox" ${evidence[field.key]?'checked':''} onchange="toggleReportEvidence(${r.id},'${field.key}',this.checked)"><span><strong>${field.label}</strong><small>${field.hint} · ${evidenceTime(evidence[field.key+'At'])}</small></span></label>`).join('')}</fieldset><p class="section-hint">仅记录你确认的进度。${state.reports[r.id].updatedAt?'最近更新：'+escapeHTML(new Date(state.reports[r.id].updatedAt).toLocaleString('zh-CN')):''}</p></div></details>`;}).join('');
+    document.getElementById('reportCardsList').innerHTML=REPORTS.map(r=>{const s=getReportWorkflowStage(r.id),m=REPORT_WORKFLOW_STAGES[s];return `<details class="report-row" id="reportCard${r.id}"><summary><div><h3>${r.id}. ${escapeHTML(getReportShortName(r))}</h3><small>报送：${escapeHTML(r.recipient)}</small></div><span class="status-pill ${s}">${m.label}</span><small>下一步：${m.hint}</small></summary><div class="report-details"><p>${escapeHTML(r.desc)}</p><div class="report-controls"><label>实际处理阶段 <select onchange="setReportStage(${r.id},this.value)">${Object.entries(REPORT_WORKFLOW_STAGES).map(([k,v])=>`<option value="${k}" ${k===s?'selected':''}>${v.label}</option>`).join('')}</select></label><button class="btn btn-outline btn-sm" onclick="openAIHandoff(${r.id})">去 AI 办理</button><button class="text-button" onclick="document.getElementById('checklistSection').scrollIntoView({behavior:'smooth'})">检查要点</button></div><p class="section-hint">仅记录你确认的进度。${state.reports[r.id].updatedAt?'最近更新：'+escapeHTML(new Date(state.reports[r.id].updatedAt).toLocaleString('zh-CN')):''}</p></div></details>`;}).join('');
   updateReportProgress();renderChecklist();renderAIStatus();
 }
 function setReportStage(id,stage){if(!REPORTS.some(r=>r.id===id)||!Object.hasOwn(REPORT_WORKFLOW_STAGES,stage))return;state.reportWorkflow[id]=stage;state.reports[id]={...state.reports[id],done:stage==='submitted',updatedAt:new Date().toISOString()};saveData();refreshWorkspace();document.getElementById('reportCard'+id).open=true;}
-function updateReportProgress(){const n=REPORTS.filter(r=>getReportWorkflowStage(r.id)==='submitted').length,pending=getReportEvidenceFollowups().length;const el=document.getElementById('reportProgress');if(el)el.textContent='报表已提交 '+n+'/7'+(pending?' · 核验待办 '+pending:' · 核验记录齐全');}
+function updateReportProgress(){const n=REPORTS.filter(r=>getReportWorkflowStage(r.id)==='submitted').length;const el=document.getElementById('reportProgress');if(el)el.textContent='报表已提交 '+n+'/7';}
 function openReportWorkspace(id){switchTab('reports');const card=document.getElementById('reportCard'+id);if(card){card.open=true;card.scrollIntoView({behavior:'smooth',block:'center'});}}
 const CHECK_GROUPS=[['数据准确性',['各项目营业额与报账员确认一致','差额营业额 = 营业额 - 代扣款 已核对','分组作业消费产值 + 跨期开票差额与项目报表一致','累计数据为1月至本月逐月累加','金额单位为万元，保留2位小数','销项税额与开票系统一致（先核税额）','总账收入与开票系统一致（后核收入）','借贷方向无负数情况']],['格式与复核',['七份报表全部编制完成','截止日期、会计责任人已更新','五档逾期金额分类正确','同期对比增减值已核对','经营情况异常问题分类分工汇总已定稿','已交复核人复核']],['后续留档与催收',['项目报表签字版本已收齐（原节点5–7号）','应收账龄分析表已发项目催收']]];
 function renderChecklist(){let index=0;document.getElementById('reportChecklist').innerHTML=CHECK_GROUPS.map(([title,items])=>{const start=index,body=items.map(text=>{const key='check_'+index++;return `<div class="checklist-item"><input type="checkbox" id="${key}" ${state.checklist[key]?'checked':''} onchange="toggleChecklist('${key}',this.checked)"><label for="${key}">${escapeHTML(text)}</label></div>`;}).join(''),done=items.filter((_,i)=>state.checklist['check_'+(start+i)]).length;return `<details class="check-group" open><summary>${title}<span class="check-progress">${done}/${items.length}</span></summary>${body}</details>`;}).join('');}
@@ -2480,8 +2456,7 @@ refreshWorkspace();
 fcInit();
 initGlassDrops();
 document.getElementById('legacyPeriod').value=state.activePeriod;
-const navTabs=Array.from(document.querySelectorAll('.nav-tab'));
-navTabs.forEach((tab,index)=>{tab.tabIndex=index===0?0:-1;tab.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();tab.click();return;}if(!['ArrowRight','ArrowLeft','Home','End'].includes(event.key))return;event.preventDefault();let next=index;if(event.key==='ArrowRight')next=(index+1)%navTabs.length;if(event.key==='ArrowLeft')next=(index-1+navTabs.length)%navTabs.length;if(event.key==='Home')next=0;if(event.key==='End')next=navTabs.length-1;navTabs[next].focus();navTabs[next].click();});});
+document.querySelectorAll('.nav-tab').forEach((tab,i)=>{tab.setAttribute('role','tab');tab.setAttribute('tabindex','0');tab.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tab.click();}};});
 document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d)d.close();}));
 let lastWorkspaceDate=localDate();
 setInterval(()=>{const next=localDate();if(next!==lastWorkspaceDate){lastWorkspaceDate=next;refreshWorkspace();}else updateDateDisplay();},60000);
@@ -2567,30 +2542,6 @@ body #extra #zakouGrid .zakou-row strong{color:#41544b}
 body #flowchart .fc-info-panel,body #flowchart .fc-svg-wrap{background:#eff5f1;border-color:var(--border)}
 body #examModal>div>div:nth-child(2)>div{background:var(--slate-l)!important;color:var(--text)!important}
 body #examModal>div>div:nth-child(2)>div:nth-child(2){background:#e9f1ec!important}
-.nav-tab{font-family:inherit;cursor:pointer;text-align:left}
-.month-focus-box.is-compact{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 16px}
-.month-focus-box.is-compact h3,.month-focus-box.is-compact p,.month-focus-box.is-compact .focus-meta{margin:0}
-.month-focus-box.is-compact p{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.followup-surface.is-empty{align-self:start}
-.followup-surface.is-empty>#followupList{padding:0 24px}
-.followup-surface.is-empty .empty-followup{display:grid;gap:4px;padding:18px 0 10px;font-size:13px;line-height:1.6}
-.empty-followup strong{color:var(--pri-d)}
-.empty-followup span{color:var(--muted);font-size:12px}
-.followup-surface.is-empty>.text-button{margin-top:6px}
-.report-subnav{display:flex;align-items:center;gap:6px;margin:4px 0 18px;padding:5px;width:max-content;max-width:100%;background:#e4eeea;border:1px solid var(--border);border-radius:8px}
-.report-subtab{font:inherit;font-size:13px;color:var(--muted);padding:7px 11px;border:0;border-radius:5px;background:transparent;cursor:pointer;white-space:nowrap}
-.report-subtab.active{background:var(--card);color:var(--pri-d);box-shadow:0 1px 2px rgba(55,83,76,.08);font-weight:600}
-#reports [data-report-pane][hidden],#assistant [data-report-pane][hidden]{display:none!important}
-.report-evidence{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:17px 0 8px;padding:11px 12px 12px;border:1px solid var(--border);border-radius:7px;background:#f1f6f3}
-.report-evidence legend{padding:0 4px;color:#4c625b;font-size:12px;font-weight:600}
-.report-evidence legend span{margin-left:6px;color:var(--muted);font-weight:400}
-.report-evidence-item{display:flex;align-items:flex-start;gap:8px;padding:8px;border:1px solid #d5e1dc;border-radius:6px;background:var(--card);cursor:pointer;min-width:0}
-.report-evidence-item input{margin-top:3px;flex:0 0 auto}
-.report-evidence-item strong,.report-evidence-item small{display:block}
-.report-evidence-item strong{font-size:12px;color:var(--text);line-height:1.45}
-.report-evidence-item small{margin-top:3px;color:var(--muted);font-size:11px;line-height:1.5}
-.report-evidence-item.is-complete{background:var(--green-l);border-color:#c9d9c5}
-@media(max-width:760px){.report-subnav{width:100%;overflow:auto}.report-evidence{grid-template-columns:1fr}.month-focus-box.is-compact{grid-template-columns:1fr auto}.month-focus-box.is-compact p{grid-column:1/-1;grid-row:2;white-space:normal}.followup-surface.is-empty .empty-followup{padding-bottom:4px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
 </body>
