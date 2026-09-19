@@ -34,6 +34,20 @@ test('tax exam modal opens all three subjects inside the workspace', () => {
   assert.equal((workspace.match(/>待完善</g)||[]).length,0);
 });
 
+test('embedded study view switches all three subjects without returning', () => {
+  assert.equal((workspace.match(/data-study-path="/g)||[]).length,3);
+  assert(workspace.includes('function switchTaxSubject(button,path,title,summary)'));
+  assert(workspace.includes("getAttribute('aria-current') === 'page'"));
+  assert(workspace.includes("setAttribute('aria-current','page')"));
+  assert(workspace.includes('aria-label="切换税务师科目"'));
+});
+
+test('tax preparation is prioritized over the economist reminder', () => {
+  assert(workspace.indexOf('class="tax-exam-card"') < workspace.indexOf('class="secondary-exam-reminder"'));
+  assert(workspace.includes('仅提醒 · 今年不备考'));
+  assert(workspace.includes('id="jingjiDaysModal"'));
+});
+
 test('new subjects contain required learning areas and isolated state', () => {
   const configs=subjectPages.map(configOf);
   assert.deepEqual(configs.map(x=>x.storageKey),['tax2state','taxPracticeState']);

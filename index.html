@@ -1125,11 +1125,6 @@ dialog.work-dialog{border:1px solid var(--border);border-radius:10px;padding:26p
       <button style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--muted);padding:4px" onclick="closeExamModal()">×</button>
     </div>
     <div style="display:flex;flex-direction:column;gap:12px">
-      <div class="exam-countdown-card" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;border-radius:8px;padding:16px;text-align:center">
-        <div style="font-size:32px;font-weight:800" id="jingjiDaysModal">-</div>
-        <div style="font-size:14px;font-weight:600;margin-top:4px">中级经济师</div>
-        <div style="font-size:11px;opacity:.8">2026年11月7-8日</div>
-      </div>
       <div class="tax-exam-card">
         <div class="tax-exam-summary">
           <div><strong id="shuiwuDaysModal">-</strong><span>距离税务师考试</span></div>
@@ -1143,6 +1138,10 @@ dialog.work-dialog{border:1px solid var(--border);border-radius:10px;padding:26p
           <a class="tax-subject tax-subject-ready" id="taxPracticeLink" href="tax-service-practice/index.html" onclick="openSubjectStudy(event,'tax-service-practice/index.html','涉税服务实务 · 2026','完整学习台 · 申报实务、案例训练与备查资料')"><span><b>涉税服务实务</b><small>完整学习台 · 申报、会计、鉴证与服务流程</small></span><em>进入学习 →</em></a>
         </div>
       </div>
+      <div class="secondary-exam-reminder" aria-label="中级经济师考试提醒">
+        <strong id="jingjiDaysModal">-</strong>
+        <span><b>中级经济师</b><small>仅提醒 · 今年不备考 · 2026年11月7-8日</small></span>
+      </div>
     </div>
     <div style="margin-top:16px;text-align:center;font-size:12px;color:var(--muted)">日期沿用已有记录，请以官方通知为准。关闭页面后不运行后台提醒。</div>
   </div>
@@ -1152,7 +1151,12 @@ dialog.work-dialog{border:1px solid var(--border);border-radius:10px;padding:26p
 <section id="taxStudyView" class="tax-study-view" hidden aria-label="税务师学习台">
   <header class="tax-study-toolbar">
     <button type="button" class="tax-study-back" onclick="closeTaxStudy()">← 返回浩哥工作台</button>
-    <div><strong id="taxStudyTitle">税务师学习台 · 2026</strong><span id="taxStudySummary">内容已整合到本工作台，本地保存学习进度</span></div>
+    <nav class="tax-study-switch" aria-label="切换税务师科目">
+      <button type="button" data-study-path="tax-law-one/index.html" onclick="switchTaxSubject(this,'tax-law-one/index.html','税法一 · 2026','完整学习台 · 知识树、练习、错题与备查资料')">税法一</button>
+      <button type="button" data-study-path="tax-law-two/index.html" onclick="switchTaxSubject(this,'tax-law-two/index.html','税法二 · 2026','完整学习台 · 双资料加权、5 道练习与备查资料')">税法二</button>
+      <button type="button" data-study-path="tax-service-practice/index.html" onclick="switchTaxSubject(this,'tax-service-practice/index.html','涉税服务实务 · 2026','完整学习台 · 申报实务、案例训练与备查资料')">涉税服务实务</button>
+    </nav>
+    <div class="tax-study-heading"><strong id="taxStudyTitle">税务师学习台 · 2026</strong><span id="taxStudySummary">内容已整合到本工作台，本地保存学习进度</span></div>
   </header>
   <div class="tax-study-stage">
     <div class="tax-study-status" id="taxStudyLoading" role="status">正在打开学习台…</div>
@@ -1166,9 +1170,11 @@ dialog.work-dialog{border:1px solid var(--border);border-radius:10px;padding:26p
 .tax-exam-summary{display:flex;align-items:center;justify-content:space-between;gap:18px;padding-bottom:13px;border-bottom:1px solid #cfe4dc}
 .tax-exam-summary>div{display:grid;gap:2px}.tax-exam-summary>div:last-child{text-align:right}.tax-exam-summary strong{font-size:28px;line-height:1;color:#287d68}.tax-exam-summary b{font-size:15px}.tax-exam-summary span{font-size:11px;color:var(--muted)}
 .tax-subject-list{display:grid;gap:8px;margin-top:12px}.tax-subject{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 12px;border:1px solid var(--border);border-radius:7px;background:var(--card);color:var(--text);text-align:left;text-decoration:none}.tax-subject span{display:grid;gap:2px}.tax-subject b{font-size:14px}.tax-subject small{font-size:11px;color:var(--muted)}.tax-subject em{font-size:12px;font-style:normal;font-weight:600;white-space:nowrap}.tax-subject-ready{border-color:#9ecbbb;cursor:pointer}.tax-subject-ready em{color:#287d68}.tax-subject-ready:hover{background:#f8fcfa;border-color:#5b9f87}.tax-subject.is-pending{background:#f4f5f3;color:var(--muted)}
-.tax-study-view{position:fixed;inset:0;z-index:300;background:#f4f7fb;display:grid;grid-template-rows:auto 1fr}.tax-study-view[hidden]{display:none}.tax-study-toolbar{min-height:58px;padding:8px 18px;display:flex;align-items:center;gap:18px;background:#fff;border-bottom:1px solid #dce5f0;box-shadow:0 2px 8px rgba(16,35,63,.08)}.tax-study-toolbar>div{display:grid;gap:1px}.tax-study-toolbar strong{font-size:15px;color:#18365e}.tax-study-toolbar span{font-size:11px;color:#65758b}.tax-study-back{border:1px solid #b9cce1;border-radius:7px;background:#f5f9fe;color:#245b9e;padding:8px 12px;font-weight:600;cursor:pointer}.tax-study-back:hover{background:#eaf3ff}.tax-study-stage{position:relative;min-height:0}.tax-study-stage iframe{display:block;width:100%;height:100%;border:0;background:#f4f7fb}.tax-study-status{position:absolute;z-index:1;inset:0;display:grid;place-content:center;text-align:center;background:#f4f7fb;color:#65758b;font-size:14px}.tax-study-status[hidden]{display:none}.tax-study-error{gap:10px}.tax-study-error button{margin:4px;padding:8px 12px;border:1px solid #b9cce1;border-radius:7px;background:#fff;color:#245b9e;cursor:pointer}
+.secondary-exam-reminder{display:flex;align-items:center;gap:13px;padding:10px 13px;border:1px solid var(--border);border-radius:8px;background:#f5f5f3;color:var(--muted)}.secondary-exam-reminder>strong{font-size:19px;color:#747870;min-width:54px}.secondary-exam-reminder>span{display:grid;gap:1px}.secondary-exam-reminder b{font-size:13px;color:#5d625b}.secondary-exam-reminder small{font-size:11px}
+.tax-study-view{position:fixed;inset:0;z-index:300;background:#f4f7fb;display:grid;grid-template-rows:auto 1fr}.tax-study-view[hidden]{display:none}.tax-study-toolbar{min-height:58px;padding:8px 18px;display:flex;align-items:center;gap:14px;background:#fff;border-bottom:1px solid #dce5f0;box-shadow:0 2px 8px rgba(16,35,63,.08)}.tax-study-heading{display:grid;gap:1px;min-width:0}.tax-study-heading strong{font-size:15px;color:#18365e}.tax-study-heading span{font-size:11px;color:#65758b}.tax-study-switch{display:flex;gap:3px;padding:3px;border-radius:9px;background:#edf2f8;overflow-x:auto;max-width:100%}.tax-study-switch button{border:0;border-radius:7px;background:transparent;color:#60728a;padding:7px 11px;font-size:12px;font-weight:650;white-space:nowrap;cursor:pointer}.tax-study-switch button:hover{background:#fff}.tax-study-switch button[aria-current="page"]{background:#fff;color:#245b9e;box-shadow:0 1px 4px rgba(16,35,63,.14)}.tax-study-back{border:1px solid #b9cce1;border-radius:7px;background:#f5f9fe;color:#245b9e;padding:8px 12px;font-weight:600;cursor:pointer;white-space:nowrap}.tax-study-back:hover{background:#eaf3ff}.tax-study-stage{position:relative;min-height:0}.tax-study-stage iframe{display:block;width:100%;height:100%;border:0;background:#f4f7fb}.tax-study-status{position:absolute;z-index:1;inset:0;display:grid;place-content:center;text-align:center;background:#f4f7fb;color:#65758b;font-size:14px}.tax-study-status[hidden]{display:none}.tax-study-error{gap:10px}.tax-study-error button{margin:4px;padding:8px 12px;border:1px solid #b9cce1;border-radius:7px;background:#fff;color:#245b9e;cursor:pointer}
 body.tax-study-open{overflow:hidden}
-@media(max-width:620px){.tax-exam-summary{align-items:flex-start}.tax-subject{align-items:flex-start}.tax-subject small{max-width:210px}.tax-study-toolbar{padding:8px 10px;gap:10px}.tax-study-toolbar span{display:none}.tax-study-back{padding:8px 10px}}
+@media(max-width:760px){.tax-study-toolbar{padding:8px 10px;gap:8px}.tax-study-heading{display:none}.tax-study-switch{flex:1}.tax-study-back{padding:8px 10px}}
+@media(max-width:620px){.tax-exam-summary{align-items:flex-start}.tax-subject{align-items:flex-start}.tax-subject small{max-width:210px}.secondary-exam-reminder{align-items:flex-start}}
 </style>
 
 <script>
@@ -1549,17 +1555,21 @@ let taxStudyReturnFocus = null;
 let taxStudyTimer = null;
 function openSubjectStudy(event,path,title,summary){
   if(event) event.preventDefault();
-  taxStudyReturnFocus = document.activeElement;
-  closeExamModal();
   const view = document.getElementById('taxStudyView');
   const frame = document.getElementById('taxStudyFrame');
   const loading = document.getElementById('taxStudyLoading');
   const error = document.getElementById('taxStudyError');
   if(!view || !frame) return;
+  if(view.hidden) taxStudyReturnFocus = document.activeElement;
+  closeExamModal();
   frame.dataset.path = path;
   frame.title = title + '学习台';
   document.getElementById('taxStudyTitle').textContent = title;
   document.getElementById('taxStudySummary').textContent = summary;
+  document.querySelectorAll('.tax-study-switch [data-study-path]').forEach(button=>{
+    if(button.dataset.studyPath === path) button.setAttribute('aria-current','page');
+    else button.removeAttribute('aria-current');
+  });
   loading.textContent = '正在打开' + title + '学习台…';
   view.hidden = false;
   document.body.classList.add('tax-study-open');
@@ -1572,6 +1582,10 @@ function openSubjectStudy(event,path,title,summary){
   clearTimeout(taxStudyTimer);
   taxStudyTimer = setTimeout(()=>taxStudyFailed(),25000);
   view.querySelector('.tax-study-back').focus();
+}
+function switchTaxSubject(button,path,title,summary){
+  if(button?.getAttribute('aria-current') === 'page') return;
+  openSubjectStudy(null,path,title,summary);
 }
 function openTaxStudy(event){return openSubjectStudy(event,'tax-law-one/index.html','税法一 · 2026','完整学习台 · 知识树、练习、错题与备查资料')}
 function taxStudyLoaded(){
