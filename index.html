@@ -1136,11 +1136,11 @@ dialog.work-dialog{border:1px solid var(--border);border-radius:10px;padding:26p
           <div><b>税务师三科</b><span>2026年11月14-15日</span></div>
         </div>
         <div class="tax-subject-list" aria-label="税务师考试科目">
-          <a class="tax-subject tax-subject-ready" id="taxLawOneLink" href="tax-law-one/index.html" onclick="openTaxStudy(event)">
+          <a class="tax-subject tax-subject-ready" id="taxLawOneLink" href="tax-law-one/index.html" onclick="openSubjectStudy(event,'tax-law-one/index.html','税法一 · 2026','完整学习台 · 知识树、练习、错题与备查资料')">
             <span><b>税法一</b><small>完整学习台 · 知识树、练习与错题本</small></span><em>进入学习 →</em>
           </a>
-          <div class="tax-subject is-pending" aria-disabled="true"><span><b>税法二</b><small>学习内容稍后完善</small></span><em>待完善</em></div>
-          <div class="tax-subject is-pending" aria-disabled="true"><span><b>涉税服务实务</b><small>学习内容稍后完善</small></span><em>待完善</em></div>
+          <a class="tax-subject tax-subject-ready" id="taxLawTwoLink" href="tax-law-two/index.html" onclick="openSubjectStudy(event,'tax-law-two/index.html','税法二 · 2026','完整学习台 · 双资料加权、5 道练习与备查资料')"><span><b>税法二</b><small>完整学习台 · 所得税主线与财产行为税</small></span><em>进入学习 →</em></a>
+          <a class="tax-subject tax-subject-ready" id="taxPracticeLink" href="tax-service-practice/index.html" onclick="openSubjectStudy(event,'tax-service-practice/index.html','涉税服务实务 · 2026','完整学习台 · 申报实务、案例训练与备查资料')"><span><b>涉税服务实务</b><small>完整学习台 · 申报、会计、鉴证与服务流程</small></span><em>进入学习 →</em></a>
         </div>
       </div>
     </div>
@@ -1148,16 +1148,16 @@ dialog.work-dialog{border:1px solid var(--border);border-radius:10px;padding:26p
   </div>
 </div>
 
-<!-- Local Tax Law I study workspace. The source application is bundled under tax-law-one/. -->
-<section id="taxStudyView" class="tax-study-view" hidden aria-label="税法一学习台">
+<!-- Local tax study workspaces. Every subject is bundled in this site. -->
+<section id="taxStudyView" class="tax-study-view" hidden aria-label="税务师学习台">
   <header class="tax-study-toolbar">
     <button type="button" class="tax-study-back" onclick="closeTaxStudy()">← 返回浩哥工作台</button>
-    <div><strong>税法一 · 2026</strong><span>内容已整合到本工作台，本地保存学习进度</span></div>
+    <div><strong id="taxStudyTitle">税务师学习台 · 2026</strong><span id="taxStudySummary">内容已整合到本工作台，本地保存学习进度</span></div>
   </header>
   <div class="tax-study-stage">
-    <div class="tax-study-status" id="taxStudyLoading" role="status">正在打开税法一学习台…</div>
+    <div class="tax-study-status" id="taxStudyLoading" role="status">正在打开学习台…</div>
     <div class="tax-study-status tax-study-error" id="taxStudyError" role="alert" hidden>学习页未能加载。<button type="button" onclick="retryTaxStudy()">重新加载</button><button type="button" onclick="closeTaxStudy()">返回工作台</button></div>
-    <iframe id="taxStudyFrame" title="税法一通关学习台" src="about:blank" loading="eager" onload="taxStudyLoaded()"></iframe>
+    <iframe id="taxStudyFrame" title="税务师通关学习台" src="about:blank" loading="eager"></iframe>
   </div>
 </section>
 <style>
@@ -1547,7 +1547,7 @@ function closeExamModal(e){
 
 let taxStudyReturnFocus = null;
 let taxStudyTimer = null;
-function openTaxStudy(event){
+function openSubjectStudy(event,path,title,summary){
   if(event) event.preventDefault();
   taxStudyReturnFocus = document.activeElement;
   closeExamModal();
@@ -1556,25 +1556,31 @@ function openTaxStudy(event){
   const loading = document.getElementById('taxStudyLoading');
   const error = document.getElementById('taxStudyError');
   if(!view || !frame) return;
+  frame.dataset.path = path;
+  frame.title = title + '学习台';
+  document.getElementById('taxStudyTitle').textContent = title;
+  document.getElementById('taxStudySummary').textContent = summary;
+  loading.textContent = '正在打开' + title + '学习台…';
   view.hidden = false;
   document.body.classList.add('tax-study-open');
   loading.hidden = false;
   error.hidden = true;
   frame.style.visibility = 'hidden';
   frame.dataset.loading = 'true';
-  if(!frame.src.endsWith('/tax-law-one/index.html')) frame.src = 'tax-law-one/index.html';
+  if(!frame.src.endsWith('/' + path)) frame.src = path;
   else frame.contentWindow.location.reload();
   clearTimeout(taxStudyTimer);
-  taxStudyTimer = setTimeout(()=>taxStudyFailed(),12000);
+  taxStudyTimer = setTimeout(()=>taxStudyFailed(),25000);
   view.querySelector('.tax-study-back').focus();
 }
+function openTaxStudy(event){return openSubjectStudy(event,'tax-law-one/index.html','税法一 · 2026','完整学习台 · 知识树、练习、错题与备查资料')}
 function taxStudyLoaded(){
   const frame = document.getElementById('taxStudyFrame');
   if(!frame || frame.dataset.loading !== 'true') return;
   frame.dataset.loading = 'false';
   clearTimeout(taxStudyTimer);
   let valid = true;
-  try{valid = !frame.contentDocument?.title || frame.contentDocument.title.includes('税');}catch(e){}
+  try{valid = !frame.contentDocument?.title || /税|实务/.test(frame.contentDocument.title);}catch(e){}
   if(!valid){taxStudyFailed();return;}
   document.getElementById('taxStudyLoading').hidden = true;
   document.getElementById('taxStudyError').hidden = true;
@@ -1592,9 +1598,9 @@ function retryTaxStudy(){
   document.getElementById('taxStudyLoading').hidden = false;
   document.getElementById('taxStudyError').hidden = true;
   frame.dataset.loading = 'true';
-  frame.src = 'tax-law-one/index.html?retry=' + Date.now();
+  frame.src = (frame.dataset.path || 'tax-law-one/index.html') + '?retry=' + Date.now();
   clearTimeout(taxStudyTimer);
-  taxStudyTimer = setTimeout(()=>taxStudyFailed(),12000);
+  taxStudyTimer = setTimeout(()=>taxStudyFailed(),25000);
 }
 function closeTaxStudy(){
   clearTimeout(taxStudyTimer);
@@ -1603,6 +1609,7 @@ function closeTaxStudy(){
   document.body.classList.remove('tax-study-open');
   if(taxStudyReturnFocus && typeof taxStudyReturnFocus.focus === 'function') taxStudyReturnFocus.focus();
 }
+document.getElementById('taxStudyFrame')?.addEventListener('load',taxStudyLoaded);
 document.addEventListener('keydown',event=>{
   if(event.key === 'Escape' && !document.getElementById('taxStudyView')?.hidden) closeTaxStudy();
 });
