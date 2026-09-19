@@ -1,0 +1,11 @@
+# Local snapshots; keep the baseline required by regression checks.
+/浩哥工作台-*.html
+!/浩哥工作台-本轮修改前备份-20260914.html
+/docs/reviews/**/*.png
+
+node_modules/
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example

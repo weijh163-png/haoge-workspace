@@ -1,0 +1,19 @@
+<section class="module active" id="dashboard">
+  <header class="today-heading">
+    <div><h1 id="dashboardTitle">今天，先做好重要的事</h1><p id="dashboardDate"></p></div>
+    <button class="exam-mini" onclick="openExamModal()"><strong>税务师考试</strong><span id="examMiniText">查看考试安排</span></button>
+  </header>
+  <div class="month-rhythm"><strong>本月节奏</strong><div id="rhythmStages"></div><button class="text-button" onclick="switchTab('workflow')">完整月度流程 →</button></div>
+  <div class="today-grid">
+    <article class="focus-surface"><header><h2 id="todayTitle">今日安排 <small id="todoCnt"></small></h2><button class="text-button" id="todayPeriodLink" onclick="switchTab('workflow')">查看本月</button></header>
+      <div id="todayTasks"></div>
+      <details class="quiet-details" id="moreTasks"><summary>其他待办 <span id="moreTaskCount"></span></summary><div id="moreTasksList"></div></details>
+      <details class="quiet-details"><summary>已完成 <span id="doneCount">0</span> 项</summary><div id="doneTasksList"></div></details>
+      <details class="quiet-details"><summary>每日例行工作</summary><p>每日开票制单、核对银行回单、跟进第三方补开票。每日记录独立保存；月底可在月度流程查看各天记录。</p></details>
+    </article>
+    <aside class="followup-surface"><header><h2>等待与催办 <small id="followupCount"></small></h2></header><div id="followupList"></div><button class="text-button" onclick="switchTab('projects')">查看项目台账 →</button></aside>
+  </div>
+  <div class="report-support"><div><strong>异常情况说明</strong><small>核心提醒 · 外部 AI 办理</small></div><p>区分当月与累计，核对口径，原因待项目确认。</p><button class="text-button" onclick="copyAITask()">复制任务要求</button><button class="btn btn-outline" onclick="openAIHandoff()">去 AI 处理 →</button></div>
+  <div class="home-foot"><button class="text-button" onclick="switchTab('reports')" id="reportProgress"></button><button class="text-button" onclick="switchTab('assistant')" id="taxMini"></button><span>按实际记录汇总 · 本地保存</span></div>
+  <details class="quiet-details earlier"><summary>本期较早任务与历史未完成记录 <span id="earlierCount"></span></summary><p>未记录不等于逾期。请核实实际处理情况后勾选；其他月份记录不会自动清除。</p><div id="earlierTaskList"></div></details>
+</section>

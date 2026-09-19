@@ -1,0 +1,10 @@
+<section class="module work-module" id="reports">
+  <header class="module-heading"><h1>报表自动化</h1><p>七份月报，明确下一步。工作台记录进度，AI 在外部软件办理，复核与提交分别确认。</p></header>
+  <div class="card report-overview"><div class="card-title">本期报表 <small id="reportPeriodCaption" class="section-hint"></small></div><p class="section-hint">原交接节点：每月3号前提交 · 交复核人复核。工作月份与报表所属期请按实际资料确认。</p><div id="reportCardsList"></div></div>
+  <div class="card" id="exceptionGuide"><div class="card-title">异常情况说明 · 核心提醒与 AI 办理</div>
+    <ul class="core-points"><li>核对所属月份与对比年份；分别查看当月、累计数据，不能互相代用。</li><li>按项目编码核对营业额、代扣款、差额营业额和增减方向。差额营业额＝营业额－代扣款。</li><li>金额统一为万元、保留两位小数。缺失数据标记待补充，不能按零填写。</li><li>保留特殊项目口径：CF251、CF450 仅在累计表填列；其他项目按原有核算规则核对。</li><li>原因必须有实际资料依据。不明确时写“待项目确认”，AI 草稿经人工复核后再定稿。</li></ul>
+    <div class="ai-action-row"><button class="btn btn-pri" onclick="openAIHandoff()">去 AI 处理</button><button class="btn btn-outline" onclick="copyAITask()">复制任务要求</button><button class="text-button" onclick="openAISettings()">设置软件入口</button><span class="ai-status" id="aiConfigStatus"></span></div>
+    <p class="section-hint" style="margin:14px 0 0">只提供办理入口，不在本页导入或计算财务数据；不会自动上传资料，也不会把打开软件记作已完成。</p>
+  </div>
+  <div class="card" id="checklistSection"><div class="card-title">提交前检查</div><div id="reportChecklist"></div><p class="section-hint">按所选月份保存。签字版本催收等后续环节独立保留，不冒充提交前已完成。</p></div>
+</section>

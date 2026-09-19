@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>浩哥工作台 · 原型C · 时间轴主导</title>
+<style>
+:root{
+  --pri:#2563eb;--pri-l:#eff6ff;--pri-d:#1e40af;
+  --teal:#0d9488;--teal-l:#f0fdfa;
+  --amber:#d97706;--amber-l:#fffbeb;
+  --green:#16a34a;--green-l:#f0fdf4;
+  --red:#dc2626;--red-l:#fef2f2;
+  --slate:#64748b;--slate-l:#f8fafc;
+  --bg:#f8fafc;--card:#fff;--border:#e5e7eb;
+  --text:#111827;--muted:#6b7280;--radius:12px;
+  --shadow:0 1px 2px rgba(16,24,40,.05);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5}
+/* ===== 顶部导航栏（保留） ===== */
+.nav-bar{background:#fff;border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nav-brand{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700}
+.nav-brand .logo{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#2563eb,#0d9488);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px}
+.nav-brand small{font-size:11px;color:var(--muted);font-weight:400}
+.nav-tabs{display:flex;gap:2px}
+.nav-tab{padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--muted);transition:.15s;user-select:none}
+.nav-tab:hover{background:var(--slate-l);color:var(--text)}
+.nav-tab.active{background:var(--pri-l);color:var(--pri);font-weight:600}
+.nav-date{font-size:12px;color:var(--muted)}
+/* ===== 布局 ===== */
+.wrap{max-width:1180px;margin:0 auto;padding:16px 20px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.topbar h1{font-size:18px}
+.topbar .sub{font-size:12px;color:var(--muted);margin-top:2px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;display:flex;align-items:center;gap:12px}
+.stat .ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.stat .n{font-size:20px;font-weight:700;line-height:1.1}
+.stat .l{font-size:10.5px;color:var(--muted)}
+.s-r{background:var(--red-l)}.s-a{background:var(--amber-l)}.s-b{background:var(--pri-l)}.s-t{background:var(--teal-l)}
+.cols{display:grid;grid-template-columns:1fr 340px;gap:12px;align-items:start}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
+.card-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.card-h .t{font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px}
+.badge{font-size:11px;font-weight:600;padding:2px 9px;border-radius:99px}
+.b-b{background:var(--pri-l);color:var(--pri)}
+.b-g{background:var(--green-l);color:var(--green)}
+/* 时间轴 */
+.tl{position:relative;padding-left:0}
+.tl-sec{position:relative;padding-left:22px;margin-bottom:6px}
+.tl-sec::before{content:'';position:absolute;left:5px;top:20px;bottom:-6px;width:2px;background:var(--border)}
+.tl-sec:last-child::before{display:none}
+.tl-dot{position:absolute;left:0;top:4px;width:12px;height:12px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 0 0 2px var(--border);background:var(--border)}
+.tl-sec.today .tl-dot{background:var(--pri);box-shadow:0 0 0 2px var(--pri-l)}
+.tl-sec.today{background:var(--pri-l);border-radius:9px;padding:8px 10px 8px 26px;margin-left:-4px}
+.tl-sec.today::before{left:9px}
+.tl-head{font-size:13px;font-weight:600;margin-bottom:2px}
+.tl-sec.today .tl-head{color:var(--pri-d)}
+.tl-sec.pass .tl-head{color:var(--muted);font-weight:500}
+.tl-items{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.tl-chip{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--slate-l);color:var(--slate)}
+.tl-chip.pass{background:var(--green-l);color:var(--green)}
+.tl-sec.today .tl-chip{padding:3px 9px}
+/* 右侧待办 */
+.todo-item{display:flex;align-items:center;gap:8px;padding:8px 6px;border-radius:7px;cursor:pointer;transition:.15s}
+.todo-item:hover{background:var(--slate-l)}
+.todo-item input{width:15px;height:15px;accent-color:var(--pri);cursor:pointer;flex-shrink:0}
+.todo-item .nm{flex:1;font-size:12.5px}
+.todo-item .tag{font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;flex-shrink:0}
+.tag-p{background:var(--red-l);color:var(--red)}
+.tag-m{background:var(--amber-l);color:var(--amber)}
+.todo-item.done .nm{text-decoration:line-through;color:var(--muted)}
+.done-toggle{margin-top:4px;font-size:12px;color:var(--green);cursor:pointer;padding:7px;border-radius:7px;text-align:center;background:var(--green-l);user-select:none}
+.done-list{display:none;margin-top:5px}
+.done-list.open{display:block}
+.done-list .todo-item .nm{color:var(--muted);text-decoration:line-through}
+.alert{display:flex;gap:8px;padding:9px 10px;border-radius:9px;font-size:11.5px;margin-top:8px}
+.alert .ic{flex-shrink:0}
+.alert.a{background:var(--amber-l)}
+.alert.r{background:var(--red-l)}
+.alert.t{background:var(--teal-l)}
+.exam-box{text-align:center;padding:6px 0 0}
+.exam-box .n{font-size:28px;font-weight:700;color:var(--pri)}
+.exam-box .l{font-size:11px;color:var(--muted);margin-top:2px}
+.foot{text-align:center;font-size:11px;color:var(--muted);margin-top:16px}
+@media(max-width:900px){.cols{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<nav class="nav-bar">
+  <div class="nav-brand"><div class="logo">浩</div>浩哥工作台<small>收入核算科</small></div>
+  <div class="nav-tabs">
+    <div class="nav-tab active">首页</div>
+    <div class="nav-tab">工作流程</div>
+    <div class="nav-tab">报表台账</div>
+    <div class="nav-tab">税务申报</div>
+    <div class="nav-tab">流程图与复盘</div>
+  </div>
+  <div class="nav-date" id="navDate"></div>
+</nav>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>月度工作时间轴 🗓️</h1>
+      <div class="sub">2026-09-11 · 当前处于【常规期】 · 全月节奏一目了然</div>
+    </div>
+    <span class="badge b-b">常规期</span>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="ic s-r">📋</div><div><div class="n" id="stTodo">5</div><div class="l">今日待办</div></div></div>
+    <div class="stat"><div class="ic s-b">🗂️</div><div><div class="n">7/7</div><div class="l">月度报表</div></div></div>
+    <div class="stat"><div class="ic s-t">🧾</div><div><div class="n">6/6</div><div class="l">税务申报</div></div></div>
+    <div class="stat"><div class="ic s-a">🎓</div><div><div class="n">64</div><div class="l">距税务师考试</div></div></div>
+  </div>
+
+  <div class="cols">
+    <div class="card">
+      <div class="card-h"><div class="t">📅 本月流程</div><div class="badge b-g">今日 11 号</div></div>
+      <div class="tl" id="tl"></div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-h"><div class="t">📋 今日待办</div><div class="badge b-b" id="todoCnt">5 项</div></div>
+        <div id="todoList"></div>
+        <div class="done-toggle" onclick="toggleDone()">✓ 已完成（<span id="doneCnt">0</span>）</div>
+        <div class="done-list" id="doneList"></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="t">⚠️ 注意事项</div></div>
+        <div class="alert a"><div class="ic">📊</div><div>同期营业额表填<b>差额</b>营业额而非全额</div></div>
+        <div class="alert r"><div class="ic">📍</div><div>应收三表：科桥空调公式、利得行跨期、科桥餐饮覆盖期间</div></div>
+        <div class="alert t"><div class="ic">🧮</div><div>差额营业额 = 账面 + 阳澄湖/华扬电子/博习企服应收借方</div></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="t">🎓 考试</div></div>
+        <div class="exam-box"><div class="n">64</div><div class="l">税务师 · 2026-11-14</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">浩哥工作台 v3 · 原型C 时间轴主导 · 数据保存在本地浏览器</div>
+</div>
+<script>
+const TL=[
+  {head:'📌 申报期 (1-10号)',today:false,pass:true,chips:[['7份报表上交','pass'],['3家统计+2家税金预估','pass'],['6家税务+个税申报','pass']]},
+  {head:'📋 常规期 (11-25号)',today:true,pass:false,chips:[['凭证录入与复核',''],['银行对账',''],['成本数据核对',''],['补开票核对','']]},
+  {head:'🔒 结账期 (26-30号)',today:false,pass:false,chips:[['收入成本结转',''],['生成经营情况表',''],['与报账员核对',''],['异常说明汇总','']]},
+];
+const TODAY=[{n:'复核21个项目收入凭证',tag:'p'},{n:'银行对账（流水核对）',tag:'m'},{n:'销项税额与收入核对',tag:'p'},{n:'第三方平台补开票核对',tag:'m'},{n:'与报账员核对成本数据',tag:''}];
+const KEY='hg_protoC';
+let state=load();
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{done:[]}}catch(e){return{done:[]}}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function tagCls(p){return p==='p'?'tag-p':p==='m'?'tag-m':''}
+function tagNm(p){return p==='p'?'紧急':p==='m'?'重要':''}
+function render(){
+  document.getElementById('tl').innerHTML=TL.map(s=>`
+    <div class="tl-sec ${s.today?'today':''} ${s.pass?'pass':''}">
+      <div class="tl-dot"></div>
+      <div class="tl-head">${s.head}</div>
+      <div class="tl-items">${s.chips.map(c=>`<span class="tl-chip ${c[1]?'pass':''}">${c[0]}</span>`).join('')}</div>
+    </div>`).join('');
+  document.getElementById('todoList').innerHTML=TODAY.map((t,i)=>`
+    <div class="todo-item ${state.done.includes(i)?'done':''}" onclick="tog(${i})">
+      <input type="checkbox" ${state.done.includes(i)?'checked':''}>
+      <div class="nm">${t.n}</div>
+      ${t.tag?`<span class="tag ${tagCls(t.tag)}">${tagNm(t.tag)}</span>`:''}
+    </div>`).join('');
+  document.getElementById('todoCnt').textContent=TODAY.length-state.done.length+' 项';
+  document.getElementById('stTodo').textContent=TODAY.length-state.done.length;
+  document.getElementById('doneCnt').textContent=state.done.length;
+  document.getElementById('doneList').innerHTML=TODAY.filter((_,i)=>state.done.includes(i)).map((t,i)=>`
+    <div class="todo-item done"><input type="checkbox" checked><div class="nm">${t.n}</div></div>`).join('');
+}
+function tog(i){const k=state.done.indexOf(i);k>-1?state.done.splice(k,1):state.done.push(i);save();render()}
+function toggleDone(){document.getElementById('doneList').classList.toggle('open')}
+document.getElementById('navDate').textContent=new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+render();
+</script>
+</body>
+</html>

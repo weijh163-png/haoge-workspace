@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>销售管理工作台</title>
+<style>
+
+:root{
+  --pri:#2563eb;--pri-l:#dbeafe;--pri-d:#1d4ed8;
+  --sec:#0d9488;--sec-l:#ccfbf1;
+  --amber:#d97706;--amber-l:#fef3c7;
+  --red:#ef4444;--red-l:#fee2e2;
+  --green:#22c55e;--green-l:#dcfce7;
+  --slate:#64748b;--slate-l:#f1f5f9;
+  --bg:#f0f4f8;--card:#ffffff;--text:#1f2937;--muted:#64748b;
+  --border:#e2e8f0;--radius:12px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;line-height:1.5}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;color:inherit}
+
+/* ---------- 顶栏 ---------- */
+.topbar{background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff;padding:0 20px;height:48px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.brand{display:flex;align-items:center;gap:6px}
+#appTitle{font-size:16px;font-weight:700}
+#appSubtitle{font-size:11px;font-weight:400;opacity:.8;padding:1px 6px;background:rgba(255,255,255,.15);border-radius:8px}
+#appOwner{font-size:11px;opacity:.7}
+.month-switch{display:flex;align-items:center;gap:6px;font-size:13px}
+.month-switch button{border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;border-radius:8px;padding:3px 10px;font-size:13px;cursor:pointer}
+.month-switch button:hover{background:rgba(255,255,255,.2)}
+#monthLabel{min-width:74px;text-align:center;font-weight:600}
+.top-actions{display:flex;gap:8px}
+.top-actions button{border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;border-radius:8px;padding:4px 10px;font-size:12px;cursor:pointer}
+.top-actions button:hover{background:rgba(255,255,255,.2)}
+
+/* ---------- 导航 ---------- */
+.nav-bar{background:#ffffff;border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:2px;overflow-x:auto;position:sticky;top:48px;z-index:49;box-shadow:var(--shadow)}
+.nav-tab{border:none;background:none;padding:12px 16px;font-size:14px;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap;cursor:pointer;transition:.2s}
+.nav-tab.active{color:var(--pri);border-bottom-color:var(--pri);font-weight:600}
+.nav-tab:hover{color:var(--pri)}
+
+/* ---------- 主体 ---------- */
+.main{max-width:1320px;margin:0 auto;padding:12px 16px 60px}
+.module{display:none}
+.module.active{display:block;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.card{background:var(--card);border-radius:10px;box-shadow:var(--shadow);padding:14px;margin-bottom:10px}
+.card-title{font-size:15px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.card-title .progress-text{font-size:12px;font-weight:600;color:var(--pri);background:var(--slate-l);padding:2px 10px;border-radius:20px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:960px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:1fr}}
+@media(max-width:760px){.grid-2{grid-template-columns:1fr}.grid-4{grid-template-columns:1fr}.nav-bar{top:96px}.topbar{gap:8px;padding:8px 12px}#appOwner{display:none}}
+
+/* ---------- KPI ---------- */
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);padding:14px 16px;display:flex;flex-direction:column;gap:6px;transition:.2s}
+.kpi-card:hover{box-shadow:var(--shadow-md)}
+.kpi-label{font-size:12px;color:var(--muted)}
+.kpi-value{font-size:28px;font-weight:800;color:var(--pri);line-height:1}
+.kpi-unit{font-size:12px;font-weight:600;color:var(--muted);margin-left:3px}
+
+/* ---------- 任务列表 ---------- */
+.task-list{display:flex;flex-direction:column;gap:6px}
+.day-task{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;background:var(--slate-l);margin-bottom:3px;transition:.2s;cursor:pointer;font-size:13px}
+.day-task:hover{background:var(--pri-l);border-color:var(--pri)}
+.day-task.done{opacity:.55}
+.day-task.done .task-text,.day-task.done span{text-decoration:line-through}
+.day-task input{accent-color:var(--pri);width:16px;height:16px;cursor:pointer;margin-top:1px;flex-shrink:0}
+.day-task .dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0}
+.day-task.done .dot{background:var(--sec)}
+.pri{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;flex-shrink:0}
+.pri.high{background:var(--red)}.pri.mid{background:var(--amber)}.pri.low{background:var(--slate)}
+
+/* ---------- 本月重点 ---------- */
+.month-focus textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px;font-size:13px;resize:vertical;background:var(--slate-l);color:var(--text)}
+.month-focus textarea:focus{outline:2px solid var(--pri);outline-offset:-1px;background:var(--card)}
+
+/* ---------- 倒计时 ---------- */
+.deadline-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.deadline-item{border:1px solid var(--border);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);box-shadow:var(--shadow)}
+.deadline-item.urgent{border-color:var(--red);background:var(--red-l)}
+.deadline-item.warn{border-color:var(--amber);background:var(--amber-l)}
+.deadline-item.done{opacity:.55}
+.deadline-item .dl-name{font-weight:600;display:block;font-size:13px}
+.deadline-item small{color:var(--muted);display:block;font-size:11px;margin-top:2px}
+.deadline-item .dl-days{margin-left:auto;font-size:16px;font-weight:800;color:var(--pri)}
+.deadline-item.urgent .dl-days{color:var(--red)}
+.mini-btn{border:1px solid var(--sec);color:var(--sec);background:none;border-radius:8px;padding:3px 10px;font-size:11px;cursor:pointer}
+.mini-btn:hover{background:var(--sec);color:#fff}
+.ok-badge{color:var(--sec);font-size:11px;font-weight:600}
+
+/* ---------- 月度节奏 ---------- */
+.rhythm{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.rhythm-item{border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;border-left:4px solid var(--border);background:var(--card);box-shadow:var(--shadow);transition:.2s}
+.rhythm-item.active{border-color:var(--pri);border-left-color:var(--pri);background:var(--pri-l)}
+.rhythm-item .rh-range{font-size:11px;color:var(--pri);font-weight:700}
+.rhythm-item strong{font-size:13px}
+.rhythm-item small{color:var(--muted);font-size:11px}
+
+/* ---------- 逐日任务 ---------- */
+.daily-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.daily-card{border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;background:var(--card);box-shadow:var(--shadow);transition:.2s}
+.daily-card.today{border-color:var(--pri);background:var(--pri-l);box-shadow:0 0 0 2px var(--pri-l),var(--shadow-md)}
+.daily-card.all-done{border-color:var(--green);background:var(--green-l)}
+.daily-head{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;color:var(--pri)}
+.today-badge{background:var(--pri);color:#fff;border-radius:20px;font-size:10px;padding:1px 8px}
+
+/* ---------- 进度条 ---------- */
+.progress-track{height:6px;background:var(--slate-l);border-radius:20px;overflow:hidden;margin-bottom:10px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--pri),var(--sec));border-radius:20px;transition:width .4s}
+
+/* ---------- tracker ---------- */
+.tracker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.tracker-card{border:1px solid var(--border);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px;background:var(--card);box-shadow:var(--shadow);transition:.2s}
+.tracker-card:hover{box-shadow:var(--shadow-md)}
+.tracker-card.done{border-color:var(--green);background:var(--green-l)}
+.tracker-card .tk-head{display:flex;align-items:center;gap:8px}
+.tracker-card .tk-head input{accent-color:var(--pri);width:16px;height:16px}
+.tracker-card small{color:var(--muted);font-size:11px}
+.tk-recipient{margin-top:auto;font-size:10px;color:var(--sec);background:var(--sec-l);border-radius:20px;padding:2px 10px;width:fit-content}
+
+/* ---------- ledger ---------- */
+.ledger-bar{display:flex;gap:10px;margin-bottom:12px;align-items:center}
+.search-input{flex:1;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;background:var(--card);box-shadow:var(--shadow)}
+.search-input:focus{outline:2px solid var(--pri);outline-offset:-1px}
+.ghost-btn{border:1px solid var(--border);background:var(--card);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--muted);cursor:pointer;box-shadow:var(--shadow)}
+.ghost-btn:hover{border-color:var(--pri);color:var(--pri);box-shadow:var(--shadow-md)}
+.ghost-btn.danger:hover{border-color:var(--red);color:var(--red)}
+.ledger-list{display:flex;flex-direction:column;gap:8px}
+.ledger-item{border:1px solid var(--border);border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap;background:var(--card);box-shadow:var(--shadow);transition:.2s}
+.ledger-item:hover{box-shadow:var(--shadow-md)}
+.ledger-item.closed{opacity:.5}
+.li-main{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.li-code{font-family:Consolas,monospace;color:var(--pri);font-size:12px;background:var(--slate-l);padding:2px 8px;border-radius:6px}
+.mini-select{border:1px solid var(--border);border-radius:8px;padding:5px 8px;font-size:12px;background:var(--card);cursor:pointer}
+.tag{font-size:11px;color:var(--sec);background:var(--sec-l);border-radius:20px;padding:2px 8px;margin-left:6px}
+.warn-tag{color:var(--amber);background:var(--amber-l)}
+
+/* ---------- checklist ---------- */
+.check-group{border:1px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:hidden;background:var(--card);box-shadow:var(--shadow)}
+.check-group summary{padding:10px 14px;font-weight:600;font-size:13px;cursor:pointer;background:var(--slate-l);position:relative;user-select:none}
+.check-group summary::after{content:'▾';position:absolute;right:14px;color:var(--muted)}
+.check-group[open] summary::after{content:'▴'}
+.check-group summary:hover{color:var(--pri)}
+.check-item{display:flex;align-items:center;gap:10px;padding:8px 14px;font-size:13px;cursor:pointer;border-top:1px dashed var(--border)}
+.check-item:hover{background:var(--slate-l)}
+.check-item.done{opacity:.55;text-decoration:line-through}
+.check-item input{accent-color:var(--pri);width:16px;height:16px}
+
+/* ---------- notices ---------- */
+.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.chip{border:1px solid var(--border);background:var(--card);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--muted);cursor:pointer;box-shadow:var(--shadow)}
+.chip.on{border-color:var(--pri);color:var(--pri);font-weight:600;background:var(--pri-l)}
+.notice-entry{border:1px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:hidden;background:var(--card);box-shadow:var(--shadow);transition:.2s}
+.notice-entry:hover{box-shadow:var(--shadow-md)}
+.notice-entry summary{padding:10px 14px;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;user-select:none}
+.notice-entry summary:hover{color:var(--pri)}
+.notice-body{padding:10px 14px;font-size:12px;color:var(--text);line-height:1.7;border-top:1px dashed var(--border);white-space:pre-wrap}
+
+/* ---------- review ---------- */
+.rev-label{display:block;font-size:12px;font-weight:600;margin:10px 0 4px;color:var(--muted)}
+.rev-textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px;font-size:13px;resize:vertical;background:var(--slate-l);box-shadow:var(--shadow)}
+.rev-textarea:focus{outline:2px solid var(--pri);outline-offset:-1px;background:var(--card)}
+.primary-btn{border:none;background:var(--pri);color:#fff;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;margin-top:12px;cursor:pointer;box-shadow:var(--shadow)}
+.primary-btn:hover{filter:brightness(1.08);box-shadow:var(--shadow-md)}
+.chart{display:flex;align-items:flex-end;gap:10px;height:130px;padding-top:8px;border-bottom:1px solid var(--border)}
+.chart-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;min-width:30px}
+.chart-bar{width:70%;max-width:40px;background:linear-gradient(180deg,var(--pri),var(--sec));border-radius:6px 6px 0 0;transition:height .4s}
+.chart-col small{font-size:11px;color:var(--muted)}
+
+/* ---------- flow ---------- */
+.fc-card{overflow-x:auto;background:var(--card);border-radius:10px;box-shadow:var(--shadow);padding:14px}
+.fc-svg{width:100%;min-width:760px;height:auto;display:block}
+.fc-node{cursor:pointer}
+.fc-node .fc-circle{transition:.2s}
+.fc-node:hover .fc-circle{filter:brightness(1.1)}
+.fc-node.hl .fc-circle{filter:brightness(1.15);stroke:#0f172a;stroke-width:2.5}
+.fc-node.hl .fc-label{font-weight:700}
+.fc-edge{stroke-dasharray:6 4;animation:flowDash 1.2s linear infinite}
+@keyframes flowDash{to{stroke-dashoffset:-10}}
+.fc-story{display:flex;align-items:center;gap:14px;padding:10px 0 0;flex-wrap:wrap}
+.fc-story .muted{font-size:12px}
+
+/* ---------- modal ---------- */
+.modal{position:fixed;inset:0;z-index:100;display:none}
+.modal.show{display:block}
+.modal-mask{position:absolute;inset:0;background:rgba(15,23,42,.45);backdrop-filter:blur(2px)}
+.modal .modal-box{position:relative;background:var(--card);border-radius:16px;max-width:560px;margin:9vh auto;padding:22px;max-height:78vh;overflow-y:auto;box-shadow:0 25px 50px rgba(0,0,0,.15)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:700;margin-bottom:14px}
+.modal .x{border:none;background:none;font-size:22px;color:var(--muted);line-height:1;cursor:pointer}
+.modal label{display:block;font-size:12px;color:var(--muted);margin:8px 0 4px}
+.modal .inp{width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;background:var(--slate-l);box-shadow:var(--shadow)}
+.modal .inp:focus{outline:2px solid var(--pri);outline-offset:-1px;background:var(--card)}
+.modal-sep{font-size:12px;font-weight:700;color:var(--muted);margin:18px 0 8px;border-bottom:1px dashed var(--border);padding-bottom:6px}
+.pm-item{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--border);font-size:13px;gap:10px}
+.pm-item code{color:var(--pri);font-size:11px;background:var(--slate-l);padding:1px 6px;border-radius:5px;margin-right:4px}
+.empty-tip{color:var(--muted);font-size:12px;padding:18px;text-align:center}
+.muted{color:var(--muted);font-size:12px}
+#saveStatus{position:fixed;right:16px;bottom:14px;font-size:12px;color:var(--sec);background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 14px;z-index:99;box-shadow:var(--shadow-md)}
+
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">
+    <span id="appTitle">销售管理工作台</span>
+    <span id="appSubtitle">月度销售 · 客户跟进 · 业绩复盘</span>
+  </div>
+  <div class="month-switch">
+    <button onclick="prevMonth()">&lt;</button>
+    <span id="monthLabel"></span>
+    <button onclick="nextMonth()">&gt;</button>
+  </div>
+  <div class="top-actions">
+    <button onclick="exportData()" title="下载当前数据备份">导出</button>
+    <button onclick="importData()" title="从备份恢复">导入</button>
+  </div>
+  <span id="appOwner">张经理</span>
+</div>
+<nav class="nav-bar" id="navTabs"></nav>
+<main class="main">
+<section class="module" id="dashboard">
+</section>
+<section class="module" id="workflow">
+</section>
+<section class="module" id="tracker">
+</section>
+<section class="module" id="ledger">
+</section>
+<section class="module" id="checklist">
+</section>
+<section class="module" id="notices">
+</section>
+<section class="module" id="review">
+</section>
+<section class="module" id="flow">
+</section>
+</main>
+<div id="ledgerModal" class="modal"></div>
+<div id="saveStatus"></div>
+<script id="app-config" type="application/json">{"shell":{"title":"销售管理工作台","subtitle":"月度销售 · 客户跟进 · 业绩复盘","owner":"张经理","storageKey":"sales_workbench_v1","monthly":true,"theme":{"primary":"#2563eb","secondary":"#0d9488","accent":"#d97706","bg":"#f0f4f8","card":"#ffffff","text":"#1f2937","muted":"#64748b"}},"tabs":[{"id":"dashboard","name":"首页"},{"id":"workflow","name":"月度流程"},{"id":"tracker","name":"业绩追踪"},{"id":"ledger","name":"客户台账"},{"id":"checklist","name":"回访清单"},{"id":"notices","name":"销售要点"},{"id":"review","name":"月度复盘"},{"id":"flow","name":"成交流程"}],"modules":{"dashboard":{"kpis":[{"label":"本月目标","value":50,"unit":"万"},{"label":"已签合同","from":{"module":"tracker","done":true},"unit":"单"},{"label":"待回款","value":12,"unit":"万"},{"label":"客户总数","from":{"module":"ledger","done":false},"unit":"家"}],"tasks":[{"text":"梳理本周意向客户名单并发给团队","pri":"high"},{"text":"跟进 3 个重点客户的报价确认","pri":"high"},{"text":"处理上季度遗留的合同回款","pri":"mid"},{"text":"更新客户跟进表并同步 CRM","pri":"mid"},{"text":"团队周会：分享成交经验","pri":"low"}],"focus":{"label":"本月重点","defaultText":"1. 冲刺季度目标 50 万\n2. 新开发 3 家行业客户\n3. 完成老客户续约 5 家"},"deadlines":[{"name":"季度业绩报告提交","date":"2026-09-25","note":"发给总监"},{"name":"客户答谢会筹备","date":"2026-09-30"},{"name":"10 月客户回访计划","date":"2026-10-05"}],"rhythm":[{"name":"冲刺期","range":"1-5日","start":1,"end":5,"desc":"月初梳理目标与重点客户"},{"name":"攻坚期","range":"6-15日","start":6,"end":15,"desc":"集中跟进意向客户，促成签约"},{"name":"回款期","range":"16-25日","start":16,"end":25,"desc":"催收回款、处理合同变更"},{"name":"收官期","range":"26日-月底","start":26,"end":32,"desc":"总结业绩、制定下月计划"}]},"workflow":{"phases":[{"name":"冲刺期","range":"1-5日","start":1,"end":5,"desc":"月初梳理目标与重点客户"},{"name":"攻坚期","range":"6-15日","start":6,"end":15,"desc":"集中跟进意向客户，促成签约"},{"name":"回款期","range":"16-25日","start":16,"end":25,"desc":"催收回款、处理合同变更"},{"name":"收官期","range":"26日-月底","start":26,"end":32,"desc":"总结业绩、制定下月计划"}],"daily":[{"day":1,"items":[{"t":"整理上月未完成客户","pri":"high"},{"t":"确认本月业绩目标","pri":"high"}]},{"day":2,"items":[{"t":"梳理意向客户名单","pri":"high"},{"t":"发送产品报价","pri":"mid"}]},{"day":3,"items":[{"t":"重点客户电话回访","pri":"high"}]},{"day":5,"items":[{"t":"提交月度滚动预测","pri":"mid"},{"t":"团队目标对齐会议","pri":"low"}]},{"day":10,"items":[{"t":"半程业绩盘点","pri":"high"},{"t":"跟进卡单客户","pri":"high"}]},{"day":15,"items":[{"t":"合同提交商务评审","pri":"high"},{"t":"更新 CRM 商机阶段","pri":"mid"}]},{"day":20,"items":[{"t":"梳理未回款明细","pri":"high"},{"t":"财务对账确认","pri":"high"}]},{"day":25,"items":[{"t":"催收重点回款","pri":"high"},{"t":"客户满意度回访","pri":"mid"}]},{"day":28,"items":[{"t":"业绩数据汇总","pri":"high"},{"t":"撰写月度复盘","pri":"mid"}]},{"day":30,"items":[{"t":"制定下月计划与目标","pri":"high"},{"t":"提交月度报告","pri":"high"}]}],"keyNodes":[{"name":"5号前提交滚动预测","desc":"报销售总监"},{"name":"10号半程盘点","desc":"核对商机漏斗"},{"name":"25号回款对账","desc":"与财务确认"},{"name":"月底提交复盘报告","desc":"含下月计划"}]},"tracker":{"group":"本月签约","items":[{"id":1,"name":"华东制造集团","desc":"生产系统升级项目","recipient":"李总"},{"id":2,"name":"天蓝科技","desc":"年度订阅续约","recipient":"王总监"},{"id":3,"name":"新锐教育","desc":"教务管理平台","recipient":"陈校长"},{"id":4,"name":"匠心设计","desc":"设计协作工具采购","recipient":"赵经理"},{"id":5,"name":"远大物流","desc":"调度系统试点","recipient":"孙总"},{"id":6,"name":"云杉数据","desc":"数据中台项目","recipient":"周总"}]},"ledger":{"title":"客户台账","codeLabel":"客户编号","fields":["行业","对接人","跟进要点"],"projects":[{"code":"C001","name":"华东制造集团","fields":["制造","李总","关注交付周期，Q4 有采购预算"],"status":"进行中"},{"code":"C002","name":"天蓝科技","fields":["互联网","王总监","续约意向强，可争取加购"]},{"code":"C003","name":"新锐教育","fields":["教育","陈校长","价格敏感，需给打包方案"],"status":"暂停"},{"code":"C004","name":"匠心设计","fields":["设计","赵经理","试用期反馈良好"]},{"code":"C005","name":"远大物流","fields":["物流","孙总","正在做内部评估"]},{"code":"C006","name":"云杉数据","fields":["数据服务","周总","已有 POC 验证"]}]},"checklist":{"groups":[["签约前",["客户需求确认会","方案与报价发送","商务条款评审","合同用印审批"]],["签约后",["回款开票申请","产品交付对接","实施计划确认","客户对接人群拉群"]],["月度收尾",["业绩台账更新","回款核销","客户满意度回访","下月计划更新"]]]},"notices":{"entries":[{"title":"报价需经商务评审","body":"超过 5 万元的报价单，提交前必须先走商务评审流程，避免返工。","cat":"流程"},{"title":"合同签署注意事项","body":"关注付款节点、违约责任、验收标准三要素；涉及定制开发需技术介入确认工作量。","cat":"合同"},{"title":"回款节奏提醒","body":"每月 20 号前与财务对账，25 号前后集中催收；回款到账后才算完成签约闭环。","cat":"财务"},{"title":"CRM 录入要求","body":"每个商机按周更新阶段与下一步动作，保持数据可追踪、可复盘。","cat":"流程"},{"title":"竞品信息收集","body":"跟客户沟通时留意竞品动态，有价值信息随手记录到客户台账跟进要点。","cat":"情报"}]},"review":{"fields":[{"key":"done","label":"本月完成情况（业绩 / 里程碑）"},{"key":"issue","label":"遇到的问题与卡点"},{"key":"improve","label":"改进措施"},{"key":"next","label":"下月计划"}],"chart":{"title":"各月完成度趋势","metric":"done"}},"flow":{"lanes":["销售","商务","财务","管理层"],"stages":["A 线索","B 商机","C 方案","D 签约","E 回款"],"nodes":[{"id":0,"lane":"销售","stage":"A 线索","label":"线索获取","visual":"1","type":"task"},{"id":1,"lane":"销售","stage":"B 商机","label":"需求确认","visual":"2","type":"task"},{"id":2,"lane":"商务","stage":"C 方案","label":"方案报价","visual":"3","type":"task"},{"id":3,"lane":"商务","stage":"C 方案","label":"商务评审","visual":"4","type":"decision","offset":42},{"id":4,"lane":"财务","stage":"D 签约","label":"合同审批","visual":"5","type":"task"},{"id":5,"lane":"销售","stage":"D 签约","label":"客户签约","visual":"6","type":"task"},{"id":6,"lane":"财务","stage":"E 回款","label":"开票回款","visual":"7","type":"task"},{"id":7,"lane":"管理层","stage":"E 回款","label":"业绩归档","visual":"8","type":"task"}],"edges":[{"from":0,"to":1,"label":"有效线索"},{"from":1,"to":2,"label":"需求明确"},{"from":2,"to":3,"label":"超5万"},{"from":3,"to":4,"label":"通过"},{"from":3,"to":2,"label":"退回修改"},{"from":4,"to":5,"label":"审批完成"},{"from":5,"to":6,"label":"合同生效"},{"from":6,"to":7,"label":"到账核销"}],"story":[{"node":0,"text":"第一步：通过渠道与转介绍获取销售线索"},{"node":1,"text":"第二步：与客户确认需求，评估匹配度"},{"node":2,"text":"第三步：输出方案与报价"},{"node":3,"text":"第四步：超5万需商务评审，未通过退回修改"},{"node":4,"text":"第五步：合同条款审批"},{"node":5,"text":"第六步：客户正式签约"},{"node":6,"text":"第七步：开票并催收款项"},{"node":7,"text":"第八步：业绩归档，形成闭环"}]}}}</script>
+<script>
+/* ============================================================
+ * workspace-generator framework.js v1.0
+ * 从「浩哥工作台 v2.1」提取的通用工作台框架，配置驱动、零业务硬编码。
+ * 由 generator.py 内联进最终单文件 HTML。
+ * 所有业务数据来自 <script id="app-config" type="application/json">
+ * ============================================================ */
+
+/* ---------- 配置读取 ---------- */
+(function () {
+  var cfgEl = document.getElementById('app-config');
+  var APP = { shell: {}, tabs: [], modules: {} };
+  try { APP = JSON.parse(cfgEl.textContent); } catch (e) { console.error('config parse error', e); }
+  window.APP = APP;
+
+  var MONTHLY = !!APP.shell.monthly;
+  var STORAGE_KEY = APP.shell.storageKey || ('workspace_' + Date.now());
+  var KEEP = APP.shell.keep || ['customProjects', 'hiddenProjects', 'noticesOpen', 'reviews'];
+
+  /* ---------- 工具 ---------- */
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function todayMonth() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+  }
+  function fmtDate(d) {
+    var y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+  }
+  function dateOf(dateStr) {
+    var parts = String(dateStr).split('-').map(Number);
+    return new Date(parts[0], (parts[1] || 1) - 1, parts[2] || 1);
+  }
+  function daysUntil(dateStr) {
+    var now = new Date(); now.setHours(0, 0, 0, 0);
+    var t = dateOf(dateStr);
+    return Math.round((t - now) / 86400000);
+  }
+  function currentDay() { return new Date().getDate(); }
+
+  /* ---------- 状态管理 ---------- */
+  var raw = null;
+  try { raw = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch (e) { raw = null; }
+  var state = raw && raw.version === 1 ? raw : { version: 1, month: MONTHLY ? todayMonth() : 'default', data: {} };
+  if (!state.data) state.data = {};
+
+  function monthKey() { return MONTHLY ? state.month : 'default'; }
+  function getState() {
+    var k = monthKey();
+    if (!state.data[k]) state.data[k] = {};
+    return state.data[k];
+  }
+  function saveAll() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { console.error('save failed', e); }
+    updateSaveStatus('已自动保存 ' + new Date().toLocaleTimeString());
+  }
+  function setField(key, val) {
+    var s = getState();
+    if (val === undefined) { delete s[key]; } else { s[key] = val; }
+    saveAll();
+  }
+  function getField(key) { return getState()[key]; }
+
+  /* ---------- 导航 ---------- */
+  function switchTab(name) {
+    var tabs = APP.tabs;
+    document.querySelectorAll('.nav-tab').forEach(function (el) {
+      el.classList.toggle('active', el.getAttribute('data-tab') === name);
+    });
+    document.querySelectorAll('.module').forEach(function (sec) {
+      var show = sec.id === name;
+      if (show) {
+        sec.classList.add('active');
+        var fn = window['render_' + sec.id];
+        if (typeof fn === 'function') { try { fn(); } catch (e) { console.error('render error ' + sec.id, e); } }
+      } else {
+        sec.classList.remove('active');
+      }
+    });
+    window.scrollTo(0, 0);
+  }
+  window.switchTab = switchTab;
+
+  function renderAll() {
+    document.querySelectorAll('.module.active').forEach(function (sec) {
+      var fn = window['render_' + sec.id];
+      if (typeof fn === 'function') { try { fn(); } catch (e) { console.error('render error ' + sec.id, e); } }
+    });
+  }
+  window.renderAll = renderAll;
+
+  var saveTimer = null;
+  function updateSaveStatus(msg) {
+    var el = document.getElementById('saveStatus');
+    if (!el) return;
+    el.textContent = msg;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () { el.textContent = ''; }, 3000);
+  }
+
+  /* ---------- 通用 DOM 构建 ---------- */
+  function el(tag, cls, html) {
+    var node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (html != null) node.innerHTML = html;
+    return node;
+  }
+  function mount(containerId, content) {
+    var c = document.getElementById(containerId);
+    if (!c) return;
+    if (typeof content === 'string') { c.innerHTML = content; } else { c.replaceChildren(content); }
+  }
+  function priorityDot(p) {
+    var map = { high: 'high', mid: 'mid', low: 'low' };
+    return '<span class="pri ' + (map[p] || 'mid') + '"></span>';
+  }
+
+  /* ---------- 模块渲染器注册表 ---------- */
+  var R = {};
+
+  /* ======== dashboard 首页 ======== */
+  R.dashboard = function (mod) {
+    if (!mod) return;
+    var s = getState();
+    var html = '';
+
+    /* KPI 卡片 */
+    if (mod.kpis && mod.kpis.length) {
+      html += '<div class="grid-4 kpi-row">';
+      mod.kpis.forEach(function (k, i) {
+        var val = k.value;
+        if (k.from) {
+          /* 从其他模块统计数据：from: {module, done} */
+          var src = APP.modules[k.from.module];
+          if (src && src.items) {
+            var items = src.items || [];
+            var doneCount = items.filter(function (it) { return s.tracker && s.tracker[String(it.id)]; }).length;
+            val = k.from.done ? doneCount : (k.from.total != null ? k.from.total : items.length);
+          } else if (src && src.projects) {
+            var custom = s.customProjects || [];
+            var hidden = s.hiddenProjects || [];
+            var all = (src.projects || []).concat(custom);
+            val = all.filter(function (p) { return hidden.indexOf(p.code) === -1; }).length;
+          } else if (src && src.groups) {
+            var keys = flattenCheckKeys(src.groups || [], s);
+            val = k.from.done ? keys.done : keys.total;
+          }
+        }
+        html += '<div class="kpi-card"><div class="kpi-label">' + esc(k.label) + '</div><div class="kpi-value">' +
+          esc(val) + (k.unit ? '<span class="kpi-unit">' + esc(k.unit) + '</span>' : '') + '</div></div>';
+      });
+      html += '</div>';
+    }
+
+    /* 今日待办 */
+    if (mod.tasks && mod.tasks.length) {
+      html += '<div class="card"><div class="card-title">今日待办</div><div class="task-list">';
+      mod.tasks.forEach(function (t, i) {
+        var id = 'task_' + i;
+        var checked = s.tasks && s.tasks[id];
+        html += '<label class="day-task' + (checked ? ' done' : '') + '"><input type="checkbox" ' + (checked ? 'checked' : '') +
+          ' onchange="toggleTask(' + i + ', this.checked)"><span class="dot"></span><span class="task-text">' +
+          priorityDot(t.pri) + esc(t.text) + '</span></label>';
+      });
+      html += '</div></div>';
+    }
+
+    /* 本月重点（可编辑） */
+    if (mod.focus) {
+      var focusText = s.focus || (mod.focus.defaultText || '');
+      html += '<div class="card month-focus"><div class="card-title">' + esc(mod.focus.label || '本月重点') +
+        '</div><textarea id="focusInput" rows="2" placeholder="记录本月重点事项…" onchange="setField(\'focus\', this.value)">' +
+        esc(focusText) + '</textarea></div>';
+    }
+
+    /* 倒计时 */
+    if (mod.deadlines && mod.deadlines.length) {
+      html += '<div class="card"><div class="card-title">倒计时</div><div class="deadline-grid">';
+      mod.deadlines.forEach(function (d, i) {
+        var left = daysUntil(d.date);
+        var cls = left <= 7 ? 'urgent' : (left <= 30 ? 'warn' : '');
+        var done = s.deadlines && s.deadlines[String(i)];
+        html += '<div class="deadline-item ' + cls + (done ? ' done' : '') + '"><div><span class="dl-name">' +
+          esc(d.name) + '</span><small>' + esc(d.date) + (d.note ? ' · ' + esc(d.note) : '') + '</small></div>' +
+          (done ? '<span class="ok-badge">已完成</span>' : '<button class="mini-btn" onclick="markDeadline(' + i + ')">完成</button>') +
+          '<strong class="dl-days">' + (left >= 0 ? left + '天' : '已到期') + '</strong></div>';
+      });
+      html += '</div></div>';
+    }
+
+    /* 月度节奏 */
+    if (mod.rhythm && mod.rhythm.length) {
+      var day = currentDay();
+      var activeIdx = 0;
+      mod.rhythm.forEach(function (ph, i) {
+        if (day >= ph.start && day <= ph.end) activeIdx = i;
+      });
+      html += '<div class="card"><div class="card-title">月度节奏</div><div class="rhythm">';
+      mod.rhythm.forEach(function (ph, i) {
+        html += '<div class="rhythm-item' + (i === activeIdx ? ' active' : '') + '"><span class="rh-range">' +
+          esc(ph.range) + '</span><strong>' + esc(ph.name) + '</strong><small>' + esc(ph.desc || '') + '</small></div>';
+      });
+      html += '</div></div>';
+    }
+
+    mount('dashboard', html);
+  };
+
+  /* ======== workflow 月度流程 ======== */
+  R.workflow = function (mod) {
+    if (!mod) return;
+    var s = getState();
+    var html = '';
+    var day = currentDay();
+
+    /* 阶段概览 */
+    if (mod.phases && mod.phases.length) {
+      html += '<div class="card"><div class="card-title">月度阶段</div><div class="rhythm">';
+      var activeIdx = 0;
+      mod.phases.forEach(function (ph, i) {
+        if (day >= ph.start && day <= ph.end) activeIdx = i;
+      });
+      mod.phases.forEach(function (ph, i) {
+        html += '<div class="rhythm-item' + (i === activeIdx ? ' active' : '') + '"><span class="rh-range">' +
+          esc(ph.range) + '</span><strong>' + esc(ph.name) + '</strong><small>' + esc(ph.desc || '') + '</small></div>';
+      });
+      html += '</div></div>';
+    }
+
+    /* 逐日任务 */
+    if (mod.daily && mod.daily.length) {
+      html += '<div class="card"><div class="card-title">逐日任务</div><div class="daily-grid">';
+      mod.daily.forEach(function (d) {
+        var isToday = d.day === day;
+        var allDone = (d.items || []).every(function (it, j) {
+          return s.daily && s.daily[d.day + '_' + j];
+        });
+        html += '<div class="daily-card' + (isToday ? ' today' : '') + (allDone ? ' all-done' : '') + '"><div class="daily-head">' +
+          '第' + d.day + '日' + (isToday ? '<span class="today-badge">今天</span>' : '') + '</div>';
+        (d.items || []).forEach(function (it, j) {
+          var key = d.day + '_' + j;
+          var checked = s.daily && s.daily[key];
+          html += '<label class="day-task' + (checked ? ' done' : '') + '"><input type="checkbox" ' + (checked ? 'checked' : '') +
+            ' onchange="toggleDaily(' + d.day + ',' + j + ', this.checked)">' + priorityDot(it.pri) + '<span>' + esc(it.t) + '</span></label>';
+        });
+        html += '</div>';
+      });
+      html += '</div></div>';
+    }
+
+    /* 关键节点 */
+    if (mod.keyNodes && mod.keyNodes.length) {
+      html += '<div class="card"><div class="card-title">关键节点</div><div class="keynodes">';
+      mod.keyNodes.forEach(function (n) {
+        html += '<div class="keynode"><strong>' + esc(n.name) + '</strong><small>' + esc(n.desc || '') + '</small></div>';
+      });
+      html += '</div></div>';
+    }
+
+    mount('workflow', html);
+  };
+
+  /* ======== tracker 进度网格 ======== */
+  R.tracker = function (mod) {
+    if (!mod) return;
+    var s = getState();
+    var items = (mod && mod.items) || [];
+    var group = (mod && mod.group) || '事项';
+    var doneCount = items.filter(function (it) { return s.tracker && s.tracker[String(it.id)]; }).length;
+    var html = '<div class="card"><div class="card-title">' + esc(group) + '进度 <span class="progress-text">' +
+      doneCount + '/' + items.length + '</span></div><div class="progress-track"><div class="progress-fill" style="width:' +
+      (items.length ? (doneCount / items.length * 100) : 0) + '%"></div></div><div class="tracker-grid">';
+    items.forEach(function (it) {
+      var id = String(it.id);
+      var checked = s.tracker && s.tracker[id];
+      html += '<div class="tracker-card' + (checked ? ' done' : '') + '"><div class="tk-head"><input type="checkbox" ' +
+        (checked ? 'checked' : '') + ' onchange="toggleTracker(' + JSON.stringify(id) + ', this.checked)">' +
+        '<strong>' + esc(it.name) + '</strong></div><small>' + esc(it.desc || '') + '</small>' +
+        (it.recipient ? '<div class="tk-recipient">' + esc(it.recipient) + '</div>' : '') + '</div>';
+    });
+    html += '</div></div>';
+    mount('tracker', html);
+  };
+
+  /* ======== ledger 台账 ======== */
+  R.ledger = function (mod) {
+    if (!mod) return;
+    var s = getState();
+    var cfg = mod || {};
+    var custom = s.customProjects || [];
+    var hidden = s.hiddenProjects || [];
+    var all = (cfg.projects || []).concat(custom.map(function (c) { return { code: c.code, name: c.name, fields: c.fields, custom: true }; }));
+    var visible = all.filter(function (p) { return hidden.indexOf(p.code) === -1; });
+    var kw = '';
+    var kwEl = document.getElementById('ledgerSearch');
+    if (kwEl) kw = (kwEl.value || '').trim().toLowerCase();
+    if (kw) {
+      visible = visible.filter(function (p) {
+        return p.code.toLowerCase().indexOf(kw) >= 0 || p.name.toLowerCase().indexOf(kw) >= 0 ||
+          (p.fields || []).some(function (f) { return String(f).toLowerCase().indexOf(kw) >= 0; });
+      });
+    }
+    var statusAt = s.ledgerStatus || {};
+
+    var html = '<div class="ledger-bar"><input id="ledgerSearch" placeholder="搜索名称 / 编号…" class="search-input" oninput="render_ledger()">' +
+      (cfg.allowManage !== false ? '<button class="ghost-btn" onclick="openLedgerManager()">管理</button>' : '') + '</div>';
+
+    if (!visible.length) {
+      html += '<div class="card"><p class="empty-tip">暂无项目，点击「管理」添加。</p></div>';
+    } else {
+      html += '<div class="card"><div class="card-title">共 ' + visible.length + ' 项</div><div class="ledger-list">';
+      visible.forEach(function (p) {
+        var st = p.custom ? '正常' : (statusAt[p.code] || '正常');
+        var stCls = st === '关闭' ? ' closed' : '';
+        html += '<div class="ledger-item' + stCls + '"><div class="li-main"><span class="li-code">' + esc(p.code) + '</span>' +
+          '<div><strong>' + esc(p.name) + '</strong>' +
+          (p.custom ? '<span class="tag">自定义</span>' : '') + '</div>' +
+          (cfg.fields && p.fields ? '<small>' + p.fields.map(esc).join(' · ') + '</small>' : '') + '</div>' +
+          '<select class="mini-select" onchange="setLedgerStatus(\'' + esc(p.code) + '\', this.value)">' +
+          (['正常', '进行中', '暂停', '关闭'].map(function (stName) {
+            return '<option' + (st === stName ? ' selected' : '') + '>' + stName + '</option>';
+          }).join('')) + '</select></div>';
+      });
+      html += '</div></div>';
+    }
+    mount('ledger', html);
+  };
+
+  /* ======== checklist 检查清单 ======== */
+  function flattenCheckKeys(groups, s) {
+    var total = 0, done = 0;
+    groups.forEach(function (g) {
+      (g[1] || []).forEach(function () {
+        var key = 'check_' + total;
+        if (s.checklist && s.checklist[key]) done++;
+        total++;
+      });
+    });
+    return { total: total, done: done };
+  }
+  R.checklist = function (mod) {
+    if (!mod) return;
+    var s = getState();
+    var groups = (mod && mod.groups) || [];
+    var keys = flattenCheckKeys(groups, s);
+    var html = '<div class="card"><div class="card-title">检查清单 <span class="progress-text">' + keys.done + '/' +
+      keys.total + '</span></div><div class="progress-track"><div class="progress-fill" style="width:' +
+      (keys.total ? (keys.done / keys.total * 100) : 0) + '%"></div></div>';
+    var idx = 0;
+    groups.forEach(function (g) {
+      var head = g[0] || '分组';
+      html += '<details class="check-group" open><summary>' + esc(head) + '</summary>';
+      (g[1] || []).forEach(function (text) {
+        var key = 'check_' + idx;
+        var checked = s.checklist && s.checklist[key];
+        html += '<label class="check-item' + (checked ? ' done' : '') + '"><input type="checkbox" ' + (checked ? 'checked' : '') +
+          ' onchange="toggleCheck(' + idx + ', this.checked)"><span>' + esc(text) + '</span></label>';
+        idx++;
+      });
+      html += '</details>';
+    });
+    html += '</div>';
+    mount('checklist', html);
+  };
+
+  /* ======== notices 注意事项 ======== */
+  R.notices = function (mod) {
+    if (!mod) return;
+    var s = getState();
+    var entries = (mod && mod.entries) || [];
+    var allOpen = !!(s.noticesOpen);
+    var cats = {};
+    entries.forEach(function (n) { cats[n.cat || '其他'] = 1; });
+    var catList = Object.keys(cats);
+    var html = '<div class="toolbar"><span class="muted">分类：</span>' +
+      catList.map(function (c) { return '<button class="chip' + (s.noticeCat && s.noticeCat !== c ? '' : ' on') + '" onclick="setNoticeCat(\'' + esc(c) + '\')">' + esc(c) + '</button>'; }).join('') +
+      '<button class="ghost-btn" style="margin-left:auto" onclick="toggleAllNotices()">' + (allOpen ? '全部收起' : '全部展开') + '</button></div>';
+    entries.forEach(function (n, i) {
+      var cat = n.cat || '其他';
+      if (s.noticeCat && s.noticeCat !== cat) return;
+      var open = allOpen || (s.noticeOpen && s.noticeOpen[i]);
+      html += '<details class="notice-entry"' + (open ? ' open' : '') + '><summary><span class="tag">' + esc(cat) +
+        '</span>' + esc(n.title) + '</summary><div class="notice-body">' + esc(n.body || '') + '</div></details>';
+    });
+    mount('notices', html);
+  };
+
+  /* ======== review 月度复盘 ======== */
+  R.review = function (mod) {
+    if (!mod) return;
+    var cfg = mod || {};
+    var fields = cfg.fields || [{ key: 'done', label: '完成情况' }, { key: 'issue', label: '问题分析' }, { key: 'improve', label: '改进措施' }, { key: 'next', label: '下月计划' }];
+    var month = monthKey();
+    var saved = (state.data[month] && state.data[month].review) || {};
+
+    var html = '<div class="card"><div class="card-title">' + esc(month) + ' 复盘</div>';
+    fields.forEach(function (f) {
+      html += '<label class="rev-label">' + esc(f.label) + '</label><textarea class="rev-textarea" rows="3" data-rk="' +
+        esc(f.key) + '" placeholder="填写 ' + esc(f.label) + '…">' + esc(saved[f.key] || '') + '</textarea>';
+    });
+    html += '<button class="primary-btn" onclick="saveReview()">保存复盘</button><span class="muted" id="reviewStatus"></span></div>';
+
+    /* 趋势图 */
+    if (cfg.chart) {
+      var months = [];
+      for (var k in state.data) { if (/^\d{4}-\d{2}$/.test(k)) months.push(k); }
+      months.sort();
+      var series = months.map(function (m) {
+        var r = state.data[m].review || {};
+        var val = r[cfg.chart.metric || 'done'];
+        var pc = parseFloat(val);
+        return { m: m, v: isNaN(pc) ? 0 : pc };
+      });
+      var maxV = 1;
+      series.forEach(function (x) { if (x.v > maxV) maxV = x.v; });
+      html += '<div class="card"><div class="card-title">' + esc(cfg.chart.title || '趋势') + '</div><div class="chart">';
+      if (!series.length) {
+        html += '<p class="empty-tip">保存复盘后显示趋势</p>';
+      } else {
+        series.forEach(function (x, i) {
+          html += '<div class="chart-col"><div class="chart-bar" style="height:' + (x.v / maxV * 100) + '%" title="' + x.v + '"></div><small>' + esc(x.m.slice(5)) + '</small></div>';
+        });
+      }
+      html += '</div></div>';
+    }
+    mount('review', html);
+  };
+
+  /* ======== flow 流程图 (archify 风格) ======== */
+  R.flow = function (mod) {
+    if (!mod) return;
+    var cfg = mod || {};
+    var lanes = cfg.lanes || [];
+    var stages = cfg.stages || ['A', 'B', 'C', 'D', 'E'];
+    var nodes = cfg.nodes || [];
+    var edges = cfg.edges || [];
+    if (!lanes.length || !nodes.length) { mount('flow', '<div class="card"><p class="empty-tip">流程图未配置。</p></div>'); return; }
+
+    var W = 1100, H = lanes.length * 150 + 70, laneH = 130, topPad = 70;
+    var colW = W / stages.length;
+    var nodeR = 24, gapY = 46;
+
+    function laneY(i) { return topPad + i * laneH; }
+    function nodeX(stageIdx) { return colW * stageIdx + colW / 2; }
+    function nodePos(n) {
+      var laneIdx = lanes.indexOf(n.lane);
+      var stageIdx = stages.indexOf(n.stage);
+      if (laneIdx < 0) laneIdx = 0;
+      if (stageIdx < 0) stageIdx = 0;
+      return { x: nodeX(stageIdx), y: laneY(laneIdx) + nodeR + gapY / 2 + (n.offset || 0) };
+    }
+
+    var hsl = [];
+    var hueBase = 200;
+    lanes.forEach(function () { hsl.push(hueBase); hueBase += 36; });
+
+    var svg = '<svg class="fc-svg" viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg">';
+    /* 泳道背景 */
+    lanes.forEach(function (lane, i) {
+      var y = laneY(i);
+      svg += '<rect x="0" y="' + (y - 20) + '" width="' + W + '" height="' + laneH + '" fill="hsl(' + hsl[i] + ',75%,96%)" rx="12"/>';
+      svg += '<text x="20" y="' + (y + nodeR + gapY / 2 + 4) + '" font-size="15" fill="hsl(' + hsl[i] + ',60%,32%)" font-weight="bold">' + esc(lane) + '</text>';
+    });
+    /* 阶段列头 */
+    stages.forEach(function (st, i) {
+      svg += '<text x="' + (colW * i + colW / 2) + '" y="26" font-size="14" fill="#64748b" text-anchor="middle" font-weight="600">' + esc(st) + '</text>';
+      svg += '<line x1="' + colW * i + '" y1="34" x2="' + colW * i + '" y2="' + H + '" stroke="#e2e8f0" stroke-dasharray="4 4"/>';
+    });
+    /* 连线（贝塞尔） */
+    edges.forEach(function (e) {
+      var a = nodePos(nodes[e.from]), b = nodePos(nodes[e.to]);
+      var dx = Math.max(30, Math.abs(b.x - a.x) / 2);
+      var path = 'M' + a.x + ' ' + a.y + ' C' + (a.x + dx) + ' ' + a.y + ', ' + (b.x - dx) + ' ' + b.y + ', ' + b.x + ' ' + b.y;
+      svg += '<path d="' + path + '" fill="none" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arrowhead)" class="fc-edge"/>';
+      if (e.label) {
+        var mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2 - 8;
+        svg += '<text x="' + mx + '" y="' + my + '" font-size="11" fill="#64748b" text-anchor="middle">' + esc(e.label) + '</text>';
+      }
+    });
+    /* 节点 */
+    nodes.forEach(function (n, i) {
+      var p = nodePos(n);
+      var type = n.type === 'decision' ? 'decision' : 'task';
+      var visual = n.visual || i;
+      svg += '<g class="fc-node" id="fcnode_' + i + '" data-idx="' + i + '" onclick="flowHighlight(' + i + ')">';
+      svg += '<circle cx="' + p.x + '" cy="' + p.y + '" r="' + nodeR + '" fill="hsl(' + hsl[lanes.indexOf(n.lane) % lanes.length] + ',65%,60%)" class="fc-circle"/>';
+      svg += '<circle cx="' + p.x + '" cy="' + p.y + '" r="12" fill="rgba(255,255,255,.85)"/>';
+      svg += '<text x="' + p.x + '" y="' + (p.y + 4) + '" font-size="12" font-weight="bold" text-anchor="middle" fill="hsl(' + hsl[lanes.indexOf(n.lane) % lanes.length] + ',60%,30%)">' + esc(visual) + '</text>';
+      svg += '<text x="' + p.x + '" y="' + (p.y + nodeR + 14) + '" font-size="12" text-anchor="middle" fill="#334155" class="fc-label">' + esc(n.label) + '</text>';
+      svg += '</g>';
+    });
+    svg += '<defs><marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#94a3b8"/></marker></defs></svg>';
+
+    /* 演示故事 */
+    var storyHtml = '';
+    if (cfg.story && cfg.story.length) {
+      storyHtml = '<div class="fc-story"><button class="primary-btn" onclick="flowPlay()">演示故事</button><span class="muted" id="fcStoryText">' +
+        esc(cfg.story[0].text) + '</span></div>';
+    }
+
+    html = '<div class="card fc-card">' + svg + storyHtml + '</div>';
+    mount('flow', html);
+  };
+
+  window.render_dashboard = function () { R.dashboard(APP.modules.dashboard); };
+  window.render_workflow = function () { R.workflow(APP.modules.workflow); };
+  window.render_tracker = function () { R.tracker(APP.modules.tracker); };
+  window.render_ledger = function () { R.ledger(APP.modules.ledger); };
+  window.render_checklist = function () { R.checklist(APP.modules.checklist); };
+  window.render_notices = function () { R.notices(APP.modules.notices); };
+  window.render_review = function () { R.review(APP.modules.review); };
+  window.render_flow = function () { R.flow(APP.modules.flow); };
+
+  /* ---------- 交互函数 ---------- */
+  window.toggleTask = function (i, checked) {
+    var s = getState(); if (!s.tasks) s.tasks = {};
+    s.tasks['task_' + i] = checked; saveAll();
+    render_dashboard();
+  };
+  window.toggleDaily = function (day, j, checked) {
+    var s = getState(); if (!s.daily) s.daily = {};
+    s.daily[day + '_' + j] = checked; saveAll();
+    render_workflow();
+  };
+  window.toggleTracker = function (id, checked) {
+    var s = getState(); if (!s.tracker) s.tracker = {};
+    s.tracker[id] = checked; saveAll();
+    render_tracker();
+  };
+  window.toggleCheck = function (idx, checked) {
+    var s = getState(); if (!s.checklist) s.checklist = {};
+    s.checklist['check_' + idx] = checked; saveAll();
+    render_checklist();
+  };
+  window.markDeadline = function (i) {
+    var s = getState(); if (!s.deadlines) s.deadlines = {};
+    s.deadlines[String(i)] = true; saveAll();
+    render_dashboard();
+  };
+  window.setLedgerStatus = function (code, val) {
+    var s = getState(); if (!s.ledgerStatus) s.ledgerStatus = {};
+    s.ledgerStatus[code] = val; saveAll();
+    render_ledger();
+  };
+  window.setNoticeCat = function (cat) {
+    var s = getState();
+    if (s.noticeCat === cat) { delete s.noticeCat; } else { s.noticeCat = cat; }
+    saveAll(); render_notices();
+  };
+  window.toggleAllNotices = function () {
+    var s = getState();
+    s.noticesOpen = !s.noticesOpen; saveAll(); render_notices();
+  };
+  window.saveReview = function () {
+    var s = getState();
+    if (!s.review) s.review = {};
+    document.querySelectorAll('.rev-textarea').forEach(function (ta) {
+      s.review[ta.getAttribute('data-rk')] = ta.value;
+    });
+    saveAll();
+    var st = document.getElementById('reviewStatus');
+    if (st) { st.textContent = '已保存 ' + new Date().toLocaleTimeString(); }
+  };
+
+  /* 流程图交互 */
+  var flowOrder = [];
+  function flowPlayOrder() {
+    var mod = APP.modules.flow; if (!mod) return;
+    var cfg = mod || {};
+    flowOrder = (cfg.story || []).map(function (s) { return s.node; }).filter(function (n) { return n != null; });
+  }
+  window.flowHighlight = function (idx) {
+    document.querySelectorAll('.fc-node').forEach(function (g) {
+      g.classList.toggle('hl', parseInt(g.getAttribute('data-idx'), 10) === idx);
+    });
+  };
+  window.flowPlay = function () {
+    var mod = APP.modules.flow; if (!mod) return;
+    var cfg = mod || {};
+    var story = cfg.story || [];
+    if (!story.length) return;
+    var i = 0;
+    var textEl = document.getElementById('fcStoryText');
+    function step() {
+      var s = story[i % story.length];
+      if (s.node != null) flowHighlight(s.node);
+      if (textEl) textEl.textContent = s.text;
+      i++;
+      setTimeout(step, 1600);
+    }
+    step();
+  };
+
+  /* 台账管理 */
+  window.openLedgerManager = function () {
+    var mod = APP.modules.ledger; if (!mod) return;
+    var cfg = mod || {};
+    var s = getState();
+    var custom = s.customProjects || [];
+    var hidden = s.hiddenProjects || [];
+    var modal = document.getElementById('ledgerModal');
+    if (!modal) return;
+    var fieldsDef = cfg.fields || [];
+    var html = '<div class="modal-mask" onclick="closeLedgerManager()"></div><div class="modal">';
+    html += '<div class="modal-head">台账管理<button class="x" onclick="closeLedgerManager()">&times;</button></div>';
+    html += '<label>编号 <input id="lmCode" class="inp"></label><label>名称 <input id="lmName" class="inp"></label>';
+    fieldsDef.forEach(function (f, i) {
+      html += '<label>' + esc(f) + ' <input id="lmF' + i + '" class="inp"></label>';
+    });
+    html += '<button class="primary-btn" onclick="addCustomProject()">添加项目</button>';
+    html += '<div class="modal-sep">自定义项目</div><div id="lmCustom"></div>';
+    html += '<div class="modal-sep">全部项目（可隐藏）</div><div id="lmAll"></div>';
+    html += '</div>';
+    modal.innerHTML = html;
+    modal.classList.add('show');
+
+    var cList = document.getElementById('lmCustom');
+    cList.innerHTML = custom.length ? custom.map(function (p, i) {
+      return '<div class="pm-item"><span><code>' + esc(p.code) + '</code> ' + esc(p.name) + '</span><button class="ghost-btn danger" onclick="deleteCustomProject(' + i + ')">删除</button></div>';
+    }).join('') : '<p class="empty-tip">暂无自定义项目</p>';
+
+    var aList = document.getElementById('lmAll');
+    var all = (cfg.projects || []).concat(custom.map(function (c) { return { code: c.code, name: c.name, custom: true }; }));
+    aList.innerHTML = all.map(function (p) {
+      var isHidden = hidden.indexOf(p.code) !== -1;
+      return '<div class="pm-item"><span><code>' + esc(p.code) + '</code> ' + esc(p.name) + (p.custom ? ' <span class="tag">自定义</span>' : '') + (isHidden ? ' <span class="tag warn-tag">已隐藏</span>' : '') + '</span>' +
+        '<button class="ghost-btn" onclick="toggleProjectHidden(\'' + esc(p.code) + '\')">' + (isHidden ? '恢复显示' : '隐藏') + '</button></div>';
+    }).join('');
+  };
+  window.closeLedgerManager = function () {
+    var modal = document.getElementById('ledgerModal');
+    if (modal) modal.classList.remove('show');
+  };
+  window.addCustomProject = function () {
+    var mod = APP.modules.ledger; if (!mod) return;
+    var cfg = mod || {};
+    var s = getState(); if (!s.customProjects) s.customProjects = [];
+    var code = (document.getElementById('lmCode').value || '').trim();
+    var name = (document.getElementById('lmName').value || '').trim();
+    if (!code || !name) { alert('编号和名称必填'); return; }
+    if (s.customProjects.some(function (p) { return p.code === code; }) || (cfg.projects || []).some(function (p) { return p.code === code; })) {
+      alert('编号已存在'); return;
+    }
+    var fieldsDef = cfg.fields || [];
+    var fields = fieldsDef.map(function (_, i) {
+      var el = document.getElementById('lmF' + i);
+      return el ? el.value.trim() : '';
+    });
+    s.customProjects.push({ code: code, name: name, fields: fields });
+    saveAll();
+    closeLedgerManager();
+    render_ledger();
+  };
+  window.deleteCustomProject = function (i) {
+    if (!confirm('确认删除该自定义项目？')) return;
+    var s = getState();
+    s.customProjects.splice(i, 1);
+    saveAll();
+    closeLedgerManager();
+    render_ledger();
+  };
+  window.toggleProjectHidden = function (code) {
+    var s = getState(); if (!s.hiddenProjects) s.hiddenProjects = [];
+    var idx = s.hiddenProjects.indexOf(code);
+    if (idx >= 0) s.hiddenProjects.splice(idx, 1); else s.hiddenProjects.push(code);
+    saveAll();
+    closeLedgerManager();
+    render_ledger();
+  };
+
+  /* 月份切换 */
+  window.prevMonth = function () {
+    if (!MONTHLY) return;
+    var p = state.month.split('-');
+    var y = +p[0], m = +p[1] - 1;
+    if (m === 0) { y--; m = 12; }
+    state.month = y + '-' + String(m).padStart(2, '0');
+    saveAll();
+    updateMonthLabel();
+    renderAll();
+  };
+  window.nextMonth = function () {
+    if (!MONTHLY) return;
+    var p = state.month.split('-');
+    var y = +p[0], m = +p[1] + 1;
+    if (m === 13) { y++; m = 1; }
+    state.month = y + '-' + String(m).padStart(2, '0');
+    saveAll();
+    updateMonthLabel();
+    renderAll();
+  };
+  function updateMonthLabel() {
+    var el = document.getElementById('monthLabel');
+    if (el) el.textContent = MONTHLY ? state.month : '';
+  }
+
+  /* 导出 / 导入 */
+  window.exportData = function () {
+    var blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (STORAGE_KEY) + '_' + todayMonth() + '_backup.json';
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+  };
+  window.importData = function () {
+    var inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = '.json';
+    inp.onchange = function () {
+      var f = inp.files[0];
+      if (!f) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        try {
+          var obj = JSON.parse(reader.result);
+          if (!obj || !obj.data) { alert('备份文件格式不正确'); return; }
+          if (!confirm('导入将覆盖当前全部数据，确认继续？')) return;
+          state = obj; saveAll(); renderAll();
+          alert('导入成功');
+        } catch (e) { alert('文件解析失败'); }
+      };
+      reader.readAsText(f);
+    };
+    inp.click();
+  };
+
+  /* 初始化 */
+  function init() {
+    /* 导航 */
+    var nav = document.getElementById('navTabs');
+    if (nav && APP.tabs) {
+      nav.innerHTML = APP.tabs.map(function (t) {
+        return '<button class="nav-tab' + (t.id === 'dashboard' ? ' active' : '') + '" data-tab="' + esc(t.id) + '" onclick="switchTab(\'' + esc(t.id) + '\')">' + esc(t.name) + '</button>';
+      }).join('');
+    }
+    var titleEl = document.getElementById('appTitle');
+    if (titleEl) titleEl.textContent = APP.shell.title || '工作台';
+    var subEl = document.getElementById('appSubtitle');
+    if (subEl) subEl.textContent = APP.shell.subtitle || '';
+    var ownerEl = document.getElementById('appOwner');
+    if (ownerEl) ownerEl.textContent = APP.shell.owner || '';
+    updateMonthLabel();
+
+    /* 初始渲染 dashboard */
+    var d = document.querySelector('.module');
+    if (d) switchTab(d.id);
+  }
+  document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+</body>
+</html>

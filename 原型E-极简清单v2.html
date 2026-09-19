@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>浩哥工作台 · 原型E · 极简清单</title>
+<style>
+:root{
+  --pri:#2563eb;--pri-l:#eff6ff;--pri-d:#1e40af;
+  --teal:#0d9488;--teal-l:#f0fdfa;
+  --amber:#d97706;--amber-l:#fffbeb;
+  --green:#16a34a;--green-l:#f0fdf4;
+  --red:#dc2626;--red-l:#fef2f2;
+  --slate:#64748b;--slate-l:#f8fafc;
+  --bg:#fafbfc;--card:#fff;--border:#eef1f5;
+  --text:#111827;--muted:#6b7280;--radius:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5}
+/* ===== 顶部导航栏（保留） ===== */
+.nav-bar{background:#fff;border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nav-brand{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700}
+.nav-brand .logo{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#2563eb,#0d9488);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px}
+.nav-brand small{font-size:11px;color:var(--muted);font-weight:400}
+.nav-tabs{display:flex;gap:2px}
+.nav-tab{padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--muted);transition:.15s;user-select:none}
+.nav-tab:hover{background:var(--slate-l);color:var(--text)}
+.nav-tab.active{background:var(--pri-l);color:var(--pri);font-weight:600}
+.nav-date{font-size:12px;color:var(--muted)}
+/* ===== 极简 ===== */
+.wrap{max-width:640px;margin:0 auto;padding:18px 16px 30px}
+.head-line{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:10px;border-bottom:1.5px solid var(--text)}
+.head-line h1{font-size:16px}
+.head-line .d{font-size:12px;color:var(--muted)}
+.sec{padding:14px 0;border-bottom:1px solid var(--border)}
+.sec-title{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.sec-title .ct{color:var(--pri);font-weight:600;font-size:11px}
+.todo-item{display:flex;align-items:center;gap:10px;padding:7px 0;cursor:pointer}
+.todo-item input{width:15px;height:15px;accent-color:var(--pri);cursor:pointer;flex-shrink:0}
+.todo-item .nm{flex:1;font-size:13px}
+.todo-item .tm{font-size:11px;color:var(--muted);flex-shrink:0}
+.todo-item .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.d-p{background:var(--red)}.d-m{background:var(--amber)}
+.todo-item.done .nm{text-decoration:line-through;color:var(--muted)}
+.line{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:12.5px}
+.line .l{color:var(--text);display:flex;align-items:center;gap:8px}
+.line .l .dept{font-size:10px;color:var(--muted);background:var(--slate-l);padding:1px 6px;border-radius:4px}
+.line .ok{color:var(--green);font-size:15px;font-weight:600}
+.done-toggle{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--green);cursor:pointer;margin-top:6px;user-select:none;padding:4px 0}
+.done-toggle .arrow{transition:.2s;font-size:9px}
+.done-toggle.open .arrow{transform:rotate(90deg)}
+.done-list{display:none}
+.done-list.open{display:block}
+.done-list .todo-item .nm{color:var(--muted);text-decoration:line-through}
+.tip{display:flex;gap:8px;font-size:11.5px;color:var(--slate);line-height:1.6}
+.tip.r{color:var(--red)}
+.tip.a{color:#b45309}
+.foot{text-align:center;font-size:11px;color:var(--muted);margin-top:20px}
+</style>
+</head>
+<body>
+<nav class="nav-bar">
+  <div class="nav-brand"><div class="logo">浩</div>浩哥工作台<small>收入核算科</small></div>
+  <div class="nav-tabs">
+    <div class="nav-tab active">首页</div>
+    <div class="nav-tab">工作流程</div>
+    <div class="nav-tab">报表台账</div>
+    <div class="nav-tab">税务申报</div>
+    <div class="nav-tab">流程图与复盘</div>
+  </div>
+  <div class="nav-date" id="navDate"></div>
+</nav>
+<div class="wrap">
+  <div class="head-line">
+    <h1>浩哥工作台</h1>
+    <div class="d">2026-09-11 周五 · 常规期</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">今日待办 <span class="ct" id="todoCnt">5 项</span></div>
+    <div id="todoList"></div>
+    <div class="done-toggle" id="doneToggle" onclick="toggleDone()"><span class="arrow">▶</span> 已完成（<span id="doneCnt">0</span>）</div>
+    <div class="done-list" id="doneList"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">月度进度 <span class="ct">报表 7/7 · 税务 6/6</span></div>
+    <div class="line"><span class="l">7 份月度报表</span><span class="ok">✓</span></div>
+    <div class="line"><span class="l">6 家税务 + 个税</span><span class="ok">✓</span></div>
+    <div class="line"><span class="l">3 家统计 + 2 家税金预估</span><span class="ok">✓</span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">重点提醒</div>
+    <div class="tip r">📍 应收三表：科桥空调汇总表公式易错；利得行易跨期；科桥餐饮复制会覆盖结算周期、收款计划期间</div>
+    <div style="height:8px"></div>
+    <div class="tip a">📊 同期营业额表填差额营业额而非全额；2027 年起取消；差额 = 账面营业额 + 阳澄湖/华扬电子/博习企服应收借方发生额</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">考试 <span class="ct">距税务师 64 天</span></div>
+    <div class="line"><span class="l">税务师考试 · 2026-11-14</span><span class="ok" style="color:var(--pri)">11.14</span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">全月节奏</div>
+    <div class="line"><span class="l">申报期 1-10</span><span style="font-size:11px;color:var(--muted)">报表 / 统计 / 税务</span></div>
+    <div class="line"><span class="l" style="color:var(--pri);font-weight:600">常规期 11-25 <span style="font-size:10px;color:var(--muted)">← 今天</span></span><span style="font-size:11px;color:var(--muted)">凭证 / 对账 / 核对</span></div>
+    <div class="line"><span class="l">结账期 26-30</span><span style="font-size:11px;color:var(--muted)">结转 / 经营表 / 核对</span></div>
+  </div>
+
+  <div class="foot">浩哥工作台 v3 · 原型E 极简清单 · 数据保存在本地浏览器</div>
+</div>
+<script>
+const TODAY=[{n:'复核21个项目收入凭证',tm:'上午',p:'p'},{n:'银行对账（流水核对）',tm:'上午',p:'m'},{n:'销项税额与收入核对',tm:'下午',p:'p'},{n:'第三方平台补开票核对',tm:'下午',p:'m'},{n:'与报账员核对成本数据',tm:'全天',p:''}];
+const KEY='hg_protoE';
+let state=load();
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{done:[]}}catch(e){return{done:[]}}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function render(){
+  document.getElementById('todoList').innerHTML=TODAY.map((t,i)=>`
+    <div class="todo-item ${state.done.includes(i)?'done':''}" onclick="tog(${i})">
+      <input type="checkbox" ${state.done.includes(i)?'checked':''}>
+      ${t.p?`<span class="dot ${t.p==='p'?'d-p':'d-m'}"></span>`:''}
+      <div class="nm">${t.n}</div>
+      <span class="tm">${t.tm}</span>
+    </div>`).join('');
+  document.getElementById('todoCnt').textContent=TODAY.length-state.done.length+' 项';
+  document.getElementById('doneCnt').textContent=state.done.length;
+  document.getElementById('doneList').innerHTML=TODAY.filter((_,i)=>state.done.includes(i)).map((t,i)=>`
+    <div class="todo-item done"><input type="checkbox" checked><div class="nm">${t.n}</div></div>`).join('');
+}
+function tog(i){const k=state.done.indexOf(i);k>-1?state.done.splice(k,1):state.done.push(i);save();render()}
+function toggleDone(){document.getElementById('doneList').classList.toggle('open');document.getElementById('doneToggle').classList.toggle('open')}
+document.getElementById('navDate').textContent=new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+render();
+</script>
+</body>
+</html>

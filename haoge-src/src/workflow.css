@@ -1,0 +1,63 @@
+/* Quiet daily workspace, separate from the monthly milestone timeline. */
+#workflow{--workflow-ink:#486779;--workflow-heading:#416277;--workflow-muted:#6b8390}
+#workflow .card-title,#workflow .module-banner h1,#workflow .module-heading h1{color:var(--workflow-heading)}
+#workflow .module-banner p,#workflow .section-hint{color:var(--workflow-muted)}
+#workflow .tl-stage-name,#workflow .tl-summary,#workflow .routine-summary strong,#workflow .routine-card h4{color:var(--workflow-ink)}
+#workflow .tl-stage-name,#workflow .tl-summary,#workflow .routine-summary strong{font-weight:700}
+#workflow .tl-date{color:#5d7a88}
+#workflow .tl-date strong{color:#557385}
+#workflow .tl-day.today .tl-date strong{color:#fff}
+#workflow .tl-more,#workflow .routine-frequency{color:#708995}
+#workflow .tl-stage-count{color:#5d7f8f;background:#f7fbfd}
+#workflow .monthly-followthrough>summary,#workflow .cycle-section .card-title{color:var(--workflow-heading)}
+#workflow .cycle-section #cycleTable{display:block}
+#workflow .cycle-section #cycleTable .section-hint{max-width:none;margin:0;line-height:1.65}
+#dashboard .today-grid{align-items:start}
+.fc-maintenance>summary,.fc-trend-card>summary{cursor:pointer;list-style:none}
+.fc-maintenance>summary::-webkit-details-marker,.fc-trend-card>summary::-webkit-details-marker{display:none}
+.fc-maintenance>summary::after,.fc-trend-card>summary::after{content:'›';float:right;font-size:22px;color:var(--pri-d);transition:transform .15s}
+.fc-maintenance[open]>summary::after,.fc-trend-card[open]>summary::after{transform:rotate(90deg)}
+.check-group>summary{display:flex;align-items:center;gap:10px}
+.check-progress{margin-left:auto;font-size:12px;font-weight:600;color:#648294;background:#f1f7fa;border-radius:999px;padding:3px 8px}
+.workflow-calendar .tl-stage-head{grid-template-columns:minmax(0,1fr) auto auto}
+.monthly-followthrough{margin-top:18px;padding-top:8px;border-top:1px solid var(--border)}
+.routine-disclosure{background:#f8fbfe;border-color:#dfeaf4}
+.routine-summary{display:flex;align-items:center;gap:16px;cursor:pointer;list-style:none}
+.routine-summary::-webkit-details-marker{display:none}
+.routine-summary strong{display:block;font-size:17px;font-weight:600}
+.routine-summary small{display:block;margin-top:5px;font-size:12px;color:var(--muted)}
+.routine-frequency{margin-left:auto;font-size:12px;color:var(--pri-d);white-space:nowrap}
+.routine-summary::after{content:'›';font-size:22px;color:var(--pri-d);transition:transform .15s}
+.routine-disclosure[open]>.routine-summary::after{transform:rotate(90deg)}
+.routine-summary:focus-visible{outline:2px solid var(--pri);outline-offset:6px;border-radius:4px}
+.routine-content{padding-top:20px}
+.routine-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:16px;font-size:13px}
+.routine-toolbar>span{font-size:12px;color:var(--muted)}
+.routine-toolbar input{width:64px;margin:0 5px;padding:6px 8px;border:1px solid var(--border);border-radius:5px;background:#fff;font:inherit}
+.routine-records{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.routine-records .task-row{padding:16px;gap:10px;background:#fff;border:1px solid var(--border);border-radius:6px}
+.routine-records .task-time{width:38px;font-size:12px}
+.routine-records .task-copy strong{font-size:14px}
+.routine-guidance{margin-top:18px;border-top:1px solid var(--border);padding-top:6px}
+.routine-guidance>summary{font-size:13px;color:var(--muted);font-weight:500}
+.routine-disclosure .grid-2{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:8px;gap:16px}
+@media(max-width:900px){.routine-records{grid-template-columns:1fr}}
+@media(max-width:600px){.routine-disclosure .grid-2{grid-template-columns:1fr}.routine-summary{gap:10px}.routine-frequency{white-space:normal;max-width:64px}.workflow-calendar .tl-stage-head{grid-template-columns:minmax(0,1fr) auto}}
+@media(prefers-reduced-motion:reduce){.routine-summary::after{transition:none}}
+
+/* Horizontal overflow creates a scroll container; keep headers in normal table flow. */
+#projects #projTable th{position:static;top:auto;z-index:auto;box-shadow:none}
+#projects #projTable thead{position:static;z-index:auto}
+
+/* Keep the full workflow available without cutting off the rightmost nodes. */
+#flowchart .fc-svg-wrap{overflow:auto;overscroll-behavior:contain}
+#flowchart .fc-svg-wrap svg{max-width:none}
+
+/* Compact two-column list for the 19 monthly companies; narrow screens return to one column. */
+#extra #zakouGrid{display:block}
+#extra #zakouGrid .zakou-items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 18px}
+#extra #zakouGrid .section-hint{margin-bottom:8px}
+#extra #zakouGrid .zakou-row{padding:10px 4px;font-size:13px}
+#extra #zakouGrid .zakou-row strong{font-weight:600;color:#4a6c7c}
+#extra #zakouGrid .zakou-row small{font-size:11px}
+@media(max-width:720px){#extra #zakouGrid .zakou-items{grid-template-columns:1fr}}

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>浩哥工作台 · 原型A · 经典三栏</title>
+<style>
+:root{
+  --pri:#2563eb;--pri-l:#eff6ff;--pri-d:#1e40af;
+  --teal:#0d9488;--teal-l:#f0fdfa;
+  --amber:#d97706;--amber-l:#fffbeb;
+  --green:#16a34a;--green-l:#f0fdf4;
+  --red:#dc2626;--red-l:#fef2f2;
+  --slate:#64748b;--slate-l:#f8fafc;
+  --bg:#f8fafc;--card:#fff;--border:#e5e7eb;
+  --text:#111827;--muted:#6b7280;--radius:10px;
+  --shadow:0 1px 2px rgba(16,24,40,.05);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5}
+/* ===== 顶部导航栏（保留） ===== */
+.nav-bar{background:#fff;border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nav-brand{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700}
+.nav-brand .logo{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#2563eb,#0d9488);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px}
+.nav-brand small{font-size:11px;color:var(--muted);font-weight:400}
+.nav-tabs{display:flex;gap:2px}
+.nav-tab{padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--muted);transition:.15s;user-select:none}
+.nav-tab:hover{background:var(--slate-l);color:var(--text)}
+.nav-tab.active{background:var(--pri-l);color:var(--pri);font-weight:600}
+.nav-date{font-size:12px;color:var(--muted)}
+/* ===== 布局 ===== */
+.wrap{max-width:1280px;margin:0 auto;padding:16px 20px}
+.hero{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.hero h1{font-size:18px}
+.hero p{font-size:12px;color:var(--muted);margin-top:2px}
+.hero-right{display:flex;gap:10px;align-items:center}
+.date-chip{background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--slate)}
+.cols{display:grid;grid-template-columns:320px 1fr 300px;gap:12px;align-items:start}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
+.card-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.card-h .t{font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px}
+.card-h .badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px}
+.b-b{background:var(--pri-l);color:var(--pri)}
+.b-g{background:var(--green-l);color:var(--green)}
+.b-a{background:var(--amber-l);color:var(--amber)}
+.b-s{background:var(--slate-l);color:var(--slate)}
+/* 待办 */
+.todo-item{display:flex;align-items:flex-start;gap:8px;padding:8px 6px;border-radius:6px;cursor:pointer;transition:.15s}
+.todo-item:hover{background:var(--slate-l)}
+.todo-item input{width:15px;height:15px;margin-top:2px;accent-color:var(--pri);cursor:pointer;flex-shrink:0}
+.todo-item .txt{flex:1}
+.todo-item .txt .nm{font-size:12.5px}
+.todo-item .txt .tm{font-size:10.5px;color:var(--muted);margin-top:1px}
+.todo-item .tag{font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;flex-shrink:0}
+.tag-p{background:var(--red-l);color:var(--red)}
+.tag-m{background:var(--amber-l);color:var(--amber)}
+.tag-n{background:var(--slate-l);color:var(--slate)}
+.todo-item.done .nm{text-decoration:line-through;color:var(--muted)}
+.done-toggle{margin-top:6px;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green);cursor:pointer;padding:6px;border-radius:6px;user-select:none}
+.done-toggle:hover{background:var(--green-l)}
+.done-toggle .arrow{transition:.2s;font-size:10px}
+.done-toggle.open .arrow{transform:rotate(90deg)}
+.done-list{display:none}
+.done-list.open{display:block}
+.done-list .todo-item .nm{color:var(--muted);text-decoration:line-through}
+/* 注意事项 */
+.alert{display:flex;gap:8px;padding:8px 10px;border-radius:8px;font-size:12px;margin-bottom:8px}
+.alert .ic{flex-shrink:0;font-size:14px}
+.alert.r{background:var(--red-l)}
+.alert.a{background:var(--amber-l)}
+.alert.t{background:var(--teal-l)}
+.alert b{display:block;font-size:12px;margin-bottom:1px}
+/* 进度条 */
+.prog-row{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px}
+.prog-row .nm{width:150px;flex-shrink:0;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog-row .bar{flex:1;height:6px;background:var(--slate-l);border-radius:99px;overflow:hidden}
+.prog-row .fill{height:100%;border-radius:99px;transition:width .4s}
+.prog-row .st{font-size:11px;font-weight:600;color:var(--slate);width:34px;text-align:right;flex-shrink:0}
+.prog-row.ok .st{color:var(--green)}
+/* 快捷 */
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.quick a{display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--text);font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;transition:.15s}
+.quick a:hover{border-color:var(--pri);color:var(--pri);background:var(--pri-l)}
+.exam-box{text-align:center;padding:10px 0 4px}
+.exam-box .n{font-size:28px;font-weight:700;color:var(--pri)}
+.exam-box .l{font-size:11px;color:var(--muted);margin-top:2px}
+.foot{text-align:center;font-size:11px;color:var(--muted);margin-top:16px;padding-top:12px;border-top:1px solid var(--border)}
+@media(max-width:1100px){.cols{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav class="nav-bar">
+  <div class="nav-brand"><div class="logo">浩</div>浩哥工作台<small>收入核算科</small></div>
+  <div class="nav-tabs">
+    <div class="nav-tab active">首页</div>
+    <div class="nav-tab">工作流程</div>
+    <div class="nav-tab">报表台账</div>
+    <div class="nav-tab">税务申报</div>
+    <div class="nav-tab">流程图与复盘</div>
+  </div>
+  <div class="nav-date" id="navDate"></div>
+</nav>
+<div class="wrap">
+  <div class="hero">
+    <div>
+      <h1>早上好，浩哥 👋</h1>
+      <p>常规期 · 距结账还有 <b style="color:var(--pri)">15</b> 天 · 距税务师考试 <b style="color:var(--amber)">64</b> 天</p>
+    </div>
+    <div class="hero-right">
+      <div class="date-chip">今日 09-11 · 周五</div>
+    </div>
+  </div>
+  <div class="cols">
+    <!-- 左：今日待办 -->
+    <div class="card">
+      <div class="card-h"><div class="t">📋 今日待办</div><div class="badge b-b" id="todoCnt">0 项</div></div>
+      <div id="todoList"></div>
+      <div class="done-toggle" id="doneToggle" onclick="toggleDone()"><span class="arrow">▶</span> 已完成事项（<span id="doneCnt">0</span>）</div>
+      <div class="done-list" id="doneList"></div>
+    </div>
+    <!-- 中：注意事项 + 快捷 -->
+    <div>
+      <div class="card">
+        <div class="card-h"><div class="t">⚠️ 重点注意事项</div></div>
+        <div class="alert r"><div class="ic">📍</div><div><b>应收账款三张表</b>科桥空调汇总表公式易错；利得行易跨期填写；科桥餐饮复制时覆盖结算周期、收款计划期间</div></div>
+        <div class="alert a"><div class="ic">📊</div><div><b>同期营业额表</b>填差额营业额而非全额；2027 年起该表取消</div></div>
+        <div class="alert t"><div class="ic">🧮</div><div><b>营业额分析表公式</b>差额 = 账面营业额 + 阳澄湖/华扬电子/博习企服应收借方发生额；全额 = 项目报表消费产值</div></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="t">🧭 快捷入口</div></div>
+        <div class="quick">
+          <a href="#" onclick="return false">📄 报表台账</a>
+          <a href="#" onclick="return false">🧾 税务申报</a>
+          <a href="#" onclick="return false">📈 流程图</a>
+          <a href="#" onclick="return false">🔁 月度复盘</a>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="t">💡 本月提醒</div></div>
+        <div style="font-size:12px;line-height:2;color:var(--slate)">
+          · 3号前：7份月度报表上交<br>
+          · 5号前：3家统计 + 2家税金预估<br>
+          · 10号前：6家税务 + 个税申报（先个税）<br>
+          · 26-30号：结账相关工作
+        </div>
+      </div>
+    </div>
+    <!-- 右：进度 + 考试 -->
+    <div>
+      <div class="card">
+        <div class="card-h"><div class="t">🗂️ 月度报表</div><div class="badge b-g">7/7</div></div>
+        <div id="rptList"></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="t">🧾 税务申报</div><div class="badge b-g">6/6</div></div>
+        <div class="prog-row ok"><div class="nm">先申报个税</div><div class="bar"><div class="fill" style="width:100%;background:var(--green)"></div></div><div class="st">✓</div></div>
+        <div class="prog-row ok"><div class="nm">6家税务申报</div><div class="bar"><div class="fill" style="width:100%;background:var(--green)"></div></div><div class="st">✓</div></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="t">🎓 考试倒计时</div></div>
+        <div class="exam-box">
+          <div class="n" id="examDays">64</div>
+          <div class="l">税务师考试 · 2026-11-14</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">浩哥工作台 v3 · 原型A 经典三栏 · 数据保存在本地浏览器</div>
+</div>
+<script>
+// ===== 数据 =====
+const TODAY=[{n:'复核21个项目收入凭证',t:'凭证录入',p:'p',tm:'上午'},{n:'银行对账（流水核对）',t:'对账',p:'m',tm:'上午'},{n:'销项税额与收入核对',t:'核对',p:'p',tm:'下午'},{n:'第三方收款平台补开票核对',t:'好哒/迅付/富友',p:'m',tm:'下午'},{n:'与报账员核对成本数据',t:'对接',p:'n',tm:'全天'}];
+const REPORTS=[['指标明细表','综合部'],['营业额统计分析表','成本核算科'],['同期营业额统计表','管理一科'],['利得行应收统计表','财务部'],['科桥应收统计表','财务部'],['科桥空调应收表','财务部'],['异常问题汇总表','管理一科']];
+const KEY='hg_protoA';
+let state=load();
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{done:[]}}catch(e){return{done:[]}}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+// ===== 渲染 =====
+function tagCls(p){return p==='p'?'tag-p':p==='m'?'tag-m':'tag-n'}
+function tagNm(p){return p==='p'?'紧急':p==='m'?'重要':'日常'}
+function render(){
+  const todo=document.getElementById('todoList');
+  todo.innerHTML=TODAY.map((t,i)=>`
+    <div class="todo-item ${state.done.includes(i)?'done':''}" onclick="tog(${i})">
+      <input type="checkbox" ${state.done.includes(i)?'checked':''}>
+      <div class="txt"><div class="nm">${t.n}</div><div class="tm">${t.t} · ${t.tm}</div></div>
+      <span class="tag ${tagCls(t.p)}">${tagNm(t.p)}</span>
+    </div>`).join('');
+  document.getElementById('todoCnt').textContent=TODAY.length-state.done.length+' 项';
+  document.getElementById('doneCnt').textContent=state.done.length;
+  document.getElementById('doneList').innerHTML=TODAY.filter((_,i)=>state.done.includes(i)).map((t,i)=>`
+    <div class="todo-item done" onclick="tog(${TODAY.indexOf(t)})">
+      <input type="checkbox" checked>
+      <div class="txt"><div class="nm">${t.n}</div></div>
+    </div>`).join('');
+  document.getElementById('rptList').innerHTML=REPORTS.map(r=>`
+    <div class="prog-row ok"><div class="nm" title="${r[0]}">${r[0]}</div><div class="bar"><div class="fill" style="width:100%;background:var(--green)"></div></div><div class="st">✓</div></div>`).join('');
+}
+function tog(i){const k=state.done.indexOf(i);k>-1?state.done.splice(k,1):state.done.push(i);save();render()}
+function toggleDone(){document.getElementById('doneList').classList.toggle('open');document.getElementById('doneToggle').classList.toggle('open')}
+document.getElementById('navDate').textContent=new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+render();
+</script>
+</body>
+</html>

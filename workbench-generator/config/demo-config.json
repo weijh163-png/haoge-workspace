@@ -1,0 +1,44 @@
+{
+  "meta": {
+    "title": "示例·成本会计工作台",
+    "brand": "成本会计工作台",
+    "brandSub": "餐饮成本核算 vDemo",
+    "periodNote": "演示版 · 基于浩哥工作台模板生成",
+    "examModalTitle": "全部考试安排",
+    "examHomeName": "初级会计师考试",
+    "examHomeDate": "2027-05-15",
+    "examHomeRange": "5月15–19日",
+    "storageKey": "demo_cost_workspace_v1",
+    "legacyStorageKey": "demo_cost_workspace_v0",
+    "fcReviewKey": "demo_fc_review",
+    "fcReviewsLegacyKey": "demo_fc_reviews",
+    "backupPrefix": "成本会计工作台-备份-",
+    "backupAppId": "demo-cost-workbench",
+    "exams": [
+      {
+        "id": "jingji",
+        "name": "初级会计师",
+        "date": "2027-05-15",
+        "text": "2027年5月15-19日"
+      },
+      {
+        "id": "shuiwu",
+        "name": "中级会计师",
+        "date": "2027-09-04",
+        "text": "2027年9月4-5日"
+      }
+    ]
+  },
+  "data": {
+    "NOTICES": [
+      {
+        "title": "示例提醒：演示新增",
+        "body": "这条是通过 config 新增的提醒，用于验证数据可替换。"
+      },
+      {
+        "title": "制单顺序",
+        "body": "制单顺序：先做收款计划单据，后做应收单单据。"
+      }
+    ]
+  }
+}
