@@ -882,6 +882,33 @@ dialog.work-dialog{border:1px solid var(--border);border-radius:10px;padding:26p
     </div>
   </div>
 
+  <!-- 税务扎口事项（收入科） -->
+  <div class="card">
+    <div class="card-title"><span class="ico">📝</span> 税务扎口事项（收入科扎口人）</div>
+    <div class="section-hint">来自管理二科通知，以科室为单位统一扎口，由扎口人统一邮件发送</div>
+    <div class="tax-grid">
+      <div class="tax-item" onclick="toggleZakouTax(1)" id="zakouTax1">
+        <div class="tx-name">税金计提表归集</div>
+        <div class="tx-status">每月10日前 → 管理二科王雅薇</div>
+      </div>
+      <div class="tax-item" onclick="toggleZakouTax(2)" id="zakouTax2">
+        <div class="tx-name">申报数据归集</div>
+        <div class="tx-status">每月16日前 → 管理二科王雅薇</div>
+      </div>
+      <div class="tax-item" onclick="toggleZakouTax(3)" id="zakouTax3">
+        <div class="tx-name">小规模500万监控表</div>
+        <div class="tx-status">每月5日发/30日催/次月1日15:00前完成</div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.8">
+      <strong>① 每月10日前：</strong>收入科每月10日税金计提表归集后统一发给管理二科。各公司税金计提表提交截止日期为申报期前1天15:00前，提交方式以科室为单位统一扎口，由扎口人统一邮件发送至 wangyawei@hqsuda.com，如使用非集团邮箱请注明发件人姓名。<br>
+      <strong>② 每月16日前：</strong>收入科每月16日申报实际申报数据归集后统一发给管理二科。资料包括：本月申报期实际申报缴纳入库的税收数据（含以前月份更正申报补税）、各公司本年累计开票明细（Excel）、各公司当月进项税抵扣明细（Excel）。<br>
+      <strong>③ 小规模纳税人500万滚动销售额监控表：</strong>每月5日发出，30日再次提醒填写，次月1日下午3点前完成。更新销售额数据并关注是否达到阈值。<br>
+      <strong>转发：</strong>管理二科每月会单独通知我，我去群里转发给收入会计即可。
+    </div>
+  </div>
+
   <!-- 统计申报 -->
   <div class="card">
     <div class="card-title"><span class="ico">📊</span> 统计申报（3家兰州公司）</div>
@@ -1446,7 +1473,12 @@ const DAILY_ROUTINES=[{t:'核对银行回单',detail:'核对到账项目与收�
 function scheduledDay(day,period=state.activePeriod){return Math.min(day,new Date(+period.slice(0,4),+period.slice(5),0).getDate());}
 function dayTasks(day,period=state.activePeriod){
   const scheduled=MONTHLY_TASKS.filter(x=>scheduledDay(x.day,period)===day).flatMap(d=>d.tasks.map((t,i)=>({...t,key:'d'+d.day+'_'+i,time:day+'日',period}))).filter(t=>t.t!=='日常开票制单、银行回单处理');
-  return scheduled.concat(DAILY_ROUTINES.map((t,i)=>({...t,key:'daily_'+day+'_'+i,pri:'low',period})));
+  const zakouTax=[];
+  if(day===5){zakouTax.push({t:'【扎口】发出小规模纳税人500万滚动销售额监控表汇总',detail:'每月5日发出，请各公司更新销售额数据并关注是否达到阈值',pri:'high',key:'zakouTax_month5',time:'5日',period});}
+  if(day===10){zakouTax.push({t:'【扎口】税金计提表归集后统一发给管理二科',detail:'以科室为单位统一扎口，邮件发送至 wangyawei@hqsuda.com，请注明发件人姓名',pri:'high',key:'zakouTax_month10',time:'10日',period});}
+  if(day===16){zakouTax.push({t:'【扎口】申报实际申报数据归集后统一发给管理二科',detail:'含税收数据、累计开票明细、进项税抵扣明细，邮件发送至 wangyawei@hqsuda.com',pri:'high',key:'zakouTax_month16',time:'16日',period});}
+  if(day===30){zakouTax.push({t:'【扎口】提醒填写小规模纳税人500万滚动销售额监控表',detail:'30日再次提醒，次月1日下午3点前完成',pri:'high',key:'zakouTax_month30',time:'30日',period});}
+  return scheduled.concat(zakouTax).concat(DAILY_ROUTINES.map((t,i)=>({...t,key:'daily_'+day+'_'+i,pri:'low',period})));
 }
 function monthHasActivity(period){
   const m=state.months[period];if(!isRecord(m))return false;
@@ -1482,7 +1514,7 @@ function renderTodayTasks(){
   document.getElementById('earlierTaskList').innerHTML=earlier.map(t=>taskMarkup(t,t.period)).join('')||'<p class="empty-state">暂无较早的未完成记录</p>';
 }
 function toggleTaskForPeriod(period,key){
-  if(!isPeriod(period)||!/^d\d+_\d+$|^daily_\d+_\d+$/.test(key))return;
+  if(!isPeriod(period)||!/^d\d+_\d+$|^daily_\d+_\d+$|^zakouTax_/.test(key))return;
   const m=getMonthState(period);m.tasks[key]=!m.tasks[key];if(saveData())refreshWorkspace();else refreshWorkspace();
 }
 function toggleDayTask(key){toggleTaskForPeriod(state.activePeriod,key);}
@@ -2550,6 +2582,8 @@ function renderZakouGrid(){const el=document.getElementById('zakouGrid');if(!el)
 function toggleZakou(i){if(!Number.isInteger(i)||i<0||i>=ZAKOU_COMPANIES.length)return;state.tasks['zakou_'+i]=!state.tasks['zakou_'+i];saveData();renderZakouGrid();}
 function renderStatistics(){for(let i=1;i<=3;i++){const el=document.getElementById('stat'+i);if(el){const done=!!state.tasks['stat_'+i];el.classList.toggle('done',done);el.setAttribute('role','button');el.setAttribute('tabindex','0');el.setAttribute('aria-pressed',done);el.querySelector('.tx-status').textContent=done?'已申报 · 点击撤销':'待申报 · 统计云+电子台账';el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleStat(i);}};}}}
 function toggleStat(id){if(![1,2,3].includes(id))return;state.tasks['stat_'+id]=!state.tasks['stat_'+id];saveData();renderStatistics();}
+function toggleZakouTax(id){if(![1,2,3].includes(id))return;state.tasks['zakouTax_'+id]=!state.tasks['zakouTax_'+id];saveData();renderZakouTax();}
+function renderZakouTax(){for(let i=1;i<=3;i++){const el=document.getElementById('zakouTax'+i);if(el){const done=!!state.tasks['zakouTax_'+i];el.classList.toggle('done',done);el.setAttribute('role','button');el.setAttribute('tabindex','0');el.setAttribute('aria-pressed',done);el.querySelector('.tx-status').textContent=done?'已完成 · 点击撤销':['每月10日前 → 管理二科王雅薇','每月16日前 → 管理二科王雅薇','每月5日发/30日催/次月1日15:00前完成'][i-1];el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleZakouTax(i);}};}}}
 function issueItems(){return UNRESOLVED.map((u,i)=>({key:'unresolved:'+u.proj+':'+u.item,code:u.proj,title:u.item,amount:u.amount,original:u.status})).concat(TAX_DIFFS.map(d=>({key:'taxdiff:'+d.code,code:d.code,title:'暂估销项税差 · '+d.name,amount:d.diff.toLocaleString('zh-CN',{minimumFractionDigits:2}),original:d.note})));}
 function getHistoricalProjectStatus(code){const rows=issueItems().filter(i=>i.code===code),closed=rows.filter(i=>state.unresolvedRecords[i.key]?.status==='closed').length;return{total:rows.length,closed,open:rows.length-closed};}
 function renderUnresolved(){
@@ -2567,7 +2601,7 @@ function refreshWorkspace(){
   const opened=Array.from(document.querySelectorAll('details[id][open]')).map(x=>x.id);
   const timelineOpen=Array.from(document.querySelectorAll('.tl-stage')).map(x=>x.classList.contains('is-open'));
   const dayOpen=Array.from(document.querySelectorAll('.tl-day.expanded')).map(x=>x.id);
-  updateDateDisplay();renderTodayTasks();renderTimeline();renderCycleTable();renderNotices();renderTaxGrid();renderReportCards();renderProjects();renderZakouGrid();renderTaxDiff();renderUnresolved();renderStatistics();renderFollowups();
+  updateDateDisplay();renderTodayTasks();renderTimeline();renderCycleTable();renderNotices();renderTaxGrid();renderReportCards();renderProjects();renderZakouGrid();renderTaxDiff();renderUnresolved();renderStatistics();renderZakouTax();renderFollowups();
   opened.forEach(id=>{const el=document.getElementById(id);if(el)el.open=true;});
   document.querySelectorAll('.tl-stage').forEach((el,i)=>{if(timelineOpen.length)el.classList.toggle('is-open',!!timelineOpen[i]);});
   dayOpen.forEach(id=>document.getElementById(id)?.classList.add('expanded'));
