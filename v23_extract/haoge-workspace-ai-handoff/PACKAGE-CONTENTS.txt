@@ -1,0 +1,21 @@
+浩哥工作台 AI 交接包文件清单
+SHA-256  相对路径  大小
+
+29faf2bb65ed8b7bfe11ee6bce2b818ebcfdbfe55f059acbae5b04b15e9ea9b5  docs/superpowers/specs/2026-09-19-tax-exam-integration-design.md  5109 bytes
+03785551976779731aa81b4528499e5d58e8b674cb751a6d933295c5c362b362  docs/superpowers/specs/2026-09-19-tax-law-two-practice-study-design.md  9247 bytes
+3aa70faa41b852df0ff7fe7f46141e019ad555afcebe9d861c86cbbcc13c7137  docs/superpowers/specs/2026-09-19-tax-subject-switch-and-ai-handoff-design.md  4441 bytes
+272e3face5fa0782b17d24673dd334481876a4a99f5fee9b7befad39a3b07df8  handoff-docs/测试与部署清单.md  2353 bytes
+65fa6f7e487ec62f011dce5a056b0bb452dc91e36d821b578306e9c6f37a0a10  handoff-docs/从这里开始.md  1303 bytes
+faab3735e9fe855fa3baf87df2e443b854b6ea7748af53c0e482f75c3708eade  handoff-docs/给其他AI的接手提示.md  1666 bytes
+e6ba79a674f6368ae32e76036c87799038839925809c715a48131d3ea32fa522  handoff-docs/项目状态与架构.md  2722 bytes
+173dc37a2cb900ff242818e2c454b642e93a2ac01701df4c7d46fb2d91cf5b17  haoge-src/浩哥工作台.html  232439 bytes
+13e4448f7910e9f19ba7ea1715f07d5c5e63baea817a43e1e4c30df62c7e73b3  haoge-src/tests/workbench.test.cjs  17936 bytes
+2a226873f88f3b8ee22744c9bb3845e4373ae5dd9fdd3ec9249d77b4623c2050  index.html  259458 bytes
+2d05a88374cdaa39a436911220c0a92686eae8eb312b14e9eb4ca66f9a90b9aa  README.md  2330 bytes
+6ea2d81654dd416224beada8a609773ab5fed67aaba78634a67264467816fdda  study/shared-app.css  6904 bytes
+c6c895f3bbc424e907500bedd120c94fbd1a310dbd3826cb71dd6c8b952d22b3  study/shared-app.js  10503 bytes
+efac4febe273482213be210eaad1ca85f23b24a2cc075bd0e75db096feead6bf  tax-law-one/index.html  26028 bytes
+92efd3056eef6970314721f652cf3c7dec1a8d037a1f058f6743c9ed19d475e0  tax-law-one/README.md  406 bytes
+7522a6dc7f7167a1e2d16aeacc021cc3711addef3dcd7a6b0052e4eeed41b7b3  tax-law-two/index.html  6731 bytes
+ad5d5cd2ccf3fd3a70daed25971c532e05f2ff08925f4ae7c668124c7e02676d  tax-service-practice/index.html  6829 bytes
+7d6fe733e7731def38e130fcb49d40afb633cdbb38eb37fa61c9d8f9bc7a9d37  tests/tax-integration.test.cjs  4919 bytes
