@@ -678,11 +678,15 @@ dialog.work-dialog{border:1px solid var(--border);border-radius:10px;padding:26p
     <summary class="card-title">特殊操作 · 完整步骤参考</summary>
 
     <div class="routine-card">
-      <h4>🟡 红冲上月发票</h4>
-      <div class="tax-step"><span class="ts-num">1</span><span>先生成对应的收款单（删掉其他金额，只保留红冲金额）</span></div>
-      <div class="tax-step"><span class="ts-num">2</span><span>点删除对应的收款单金额</span></div>
-      <div class="tax-step"><span class="ts-num">3</span><span>找到对应的应收单，红冲对应的收款金额</span></div>
-      <div class="tax-step"><span class="ts-num">4</span><span>项目提供红冲发票申请，并重新做收款计划和应收单</span></div>
+      <h4>🟡 发票红冲完整流程</h4>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px"><strong>会计操作</strong></div>
+      <div class="tax-step"><span class="ts-num">1</span><span>生成与红冲金额一致的收款单并保存。若应收单含多笔金额，仅保留需红冲金额，删除其他金额；保存后再删除该收款单</span></div>
+      <div class="tax-step"><span class="ts-num">2</span><span>找到对应应收单，进入编辑页面点击"红冲"并制单。若应收单含多笔金额，仅保留本次需红冲金额，删除其他金额后保存</span></div>
+      <div class="tax-step"><span class="ts-num">3</span><span>至此该发票在系统中完成红冲。若项目需重新开票，按首次开票要求办理相关手续后执行开票</span></div>
+      <div style="font-size:12px;color:var(--muted);margin:10px 0 8px"><strong>项目操作</strong></div>
+      <div class="tax-step"><span class="ts-num">4</span><span>填写《开票申请表》，注明需红冲发票的相关信息，金额填写对应负数，并同步登记至QQ群开票申请链接</span></div>
+      <div class="tax-step"><span class="ts-num">5</span><span>如需重新开票，重新制作收款计划及应收单，填写《开票申请表》（新开票信息），并同步登记至QQ群开票申请链接</span></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px">注意：红冲后原收款计划视同作废，需新做收款计划；该操作不属于重复制作收款计划。</div>
     </div>
 
     <div class="routine-card">
@@ -1288,7 +1292,7 @@ const NOTICES = [
   {title:'销项税额与开票系统核对',body:'核对销项税额与开票系统税额一致。\n核对顺序：先核对销项税额，后核对收入。'},
   {title:'总账收入与开票系统核对',body:'总账收入 = 主营业务收入/餐饮收入 + 商品销售收入 + 其他服务收入。\n核对总账收入与开票系统收入一致。\n注意：先核对销项税额，后核对收入。'},
   {title:'出售固定资产税金处理',body:'出售固定资产，制单时税金要从全额营业额中手动扣除。'},
-  {title:'红冲上月发票操作',body:'1) 先生成对应的收款单（删掉其他金额，只保留红冲金额），点删除对应的收款单金额；\n2) 找到对应的应收单，红冲对应的收款金额；\n3) 项目提供红冲发票申请，并重新做收款计划和应收单。'},
+  {title:'发票红冲完整流程',body:'【会计操作】\n1) 生成与红冲金额一致的收款单并保存。若应收单含多笔金额，仅保留需红冲金额，删除其他金额；保存后再删除该收款单。\n2) 找到对应应收单，进入编辑页面点击"红冲"并制单。若应收单含多笔金额，仅保留本次需红冲金额，删除其他金额后保存。\n3) 至此该发票在系统中完成红冲。若需重新开票，按首次开票要求办理相关手续后执行开票。\n\n【项目操作】\n4) 填写《开票申请表》，注明需红冲发票的相关信息，金额填写对应负数，并同步登记至QQ群开票申请链接。\n5) 如需重新开票，重新制作收款计划及应收单，填写《开票申请表》（新开票信息），并同步登记至QQ群开票申请链接。\n注意：红冲后原收款计划视同作废，需新做收款计划；该操作不属于重复制作收款计划。'},
   {title:'制单顺序',body:'制单顺序：先做收款计划单据，后做应收单单据。'},
   {title:'银行收款与收款单金额不符',body:'查询方法：\n1) 点击收款单管理 → 未生效的单据 → 联查单据 → 收款计划；\n2) 确认冲销金额是否与银行回单金额一致；\n3) 如果一致，手动修改收款单管理的"组织本币金额"（贷方）与银行保持一致；\n4) 尾款待下次进账时，自制收款单查询该金额。'},
   {title:'第三方收款次月补开票',body:'次月月上旬中旬，提醒有第三方收入的项目，提交上月第三方收入的开票申请和应收单；\n冲销上月收款计划对应的预估收入。\n好哒、迅付、富友三家平台：根据收款总额扣减上月已开票金额，剩余差额补开票。'},
@@ -1471,14 +1475,17 @@ function updateDateDisplay(){
 function editMonthFocus(){const text=prompt('编辑本月重点（每行一条）：',((state.monthFocus||{})[state.activePeriod]||[]).join('\n'));if(text===null)return;if(!state.monthFocus)state.monthFocus={};state.monthFocus[state.activePeriod]=text.split('\n').map(s=>s.trim()).filter(s=>s);saveData();updateDateDisplay();showToast('本月重点已保存');}
 const DAILY_ROUTINES=[{t:'核对银行回单',detail:'核对到账项目与收款金额',time:'每天'},{t:'统一开票制单',detail:'检查开票申请、应收单与跨期收入',time:'15:00'},{t:'跟进第三方补开票',detail:'按实际缺失资料提前催办',time:'每天'}];
 function scheduledDay(day,period=state.activePeriod){return Math.min(day,new Date(+period.slice(0,4),+period.slice(5),0).getDate());}
+function zakouTaxTasks(day,period=state.activePeriod){
+  const list=[];
+  if(day===5){list.push({t:'【扎口】发出小规模纳税人500万滚动销售额监控表汇总',detail:'每月5日发出，请各公司更新销售额数据并关注是否达到阈值',pri:'high',key:'zakouTax_month5',time:'5日',period});}
+  if(day===10){list.push({t:'【扎口】税金计提表归集后统一发给管理二科',detail:'以科室为单位统一扎口，邮件发送至 wangyawei@hqsuda.com，请注明发件人姓名',pri:'high',key:'zakouTax_month10',time:'10日',period});}
+  if(day===16){list.push({t:'【扎口】申报实际申报数据归集后统一发给管理二科',detail:'含税收数据、累计开票明细、进项税抵扣明细，邮件发送至 wangyawei@hqsuda.com',pri:'high',key:'zakouTax_month16',time:'16日',period});}
+  if(day===30){list.push({t:'【扎口】提醒填写小规模纳税人500万滚动销售额监控表',detail:'30日再次提醒，次月1日下午3点前完成',pri:'high',key:'zakouTax_month30',time:'30日',period});}
+  return list;
+}
 function dayTasks(day,period=state.activePeriod){
   const scheduled=MONTHLY_TASKS.filter(x=>scheduledDay(x.day,period)===day).flatMap(d=>d.tasks.map((t,i)=>({...t,key:'d'+d.day+'_'+i,time:day+'日',period}))).filter(t=>t.t!=='日常开票制单、银行回单处理');
-  const zakouTax=[];
-  if(day===5){zakouTax.push({t:'【扎口】发出小规模纳税人500万滚动销售额监控表汇总',detail:'每月5日发出，请各公司更新销售额数据并关注是否达到阈值',pri:'high',key:'zakouTax_month5',time:'5日',period});}
-  if(day===10){zakouTax.push({t:'【扎口】税金计提表归集后统一发给管理二科',detail:'以科室为单位统一扎口，邮件发送至 wangyawei@hqsuda.com，请注明发件人姓名',pri:'high',key:'zakouTax_month10',time:'10日',period});}
-  if(day===16){zakouTax.push({t:'【扎口】申报实际申报数据归集后统一发给管理二科',detail:'含税收数据、累计开票明细、进项税抵扣明细，邮件发送至 wangyawei@hqsuda.com',pri:'high',key:'zakouTax_month16',time:'16日',period});}
-  if(day===30){zakouTax.push({t:'【扎口】提醒填写小规模纳税人500万滚动销售额监控表',detail:'30日再次提醒，次月1日下午3点前完成',pri:'high',key:'zakouTax_month30',time:'30日',period});}
-  return scheduled.concat(zakouTax).concat(DAILY_ROUTINES.map((t,i)=>({...t,key:'daily_'+day+'_'+i,pri:'low',period})));
+  return scheduled.concat(zakouTaxTasks(day,period)).concat(DAILY_ROUTINES.map((t,i)=>({...t,key:'daily_'+day+'_'+i,pri:'low',period})));
 }
 function monthHasActivity(period){
   const m=state.months[period];if(!isRecord(m))return false;
@@ -1528,7 +1535,15 @@ function renderFollowups(){
 }
 function monthlyMilestones(){
   // Only the monthly view omits routine placeholders; preserve original task keys and Today behavior.
-  return MONTHLY_TASKS.map(d=>({...d,tasks:d.tasks.map((t,i)=>({...t,key:'d'+d.day+'_'+i})).filter(t=>t.t!=='日常开票制单、银行回单处理')})).filter(d=>d.tasks.length);
+  const out=MONTHLY_TASKS.map(d=>({...d,tasks:d.tasks.map((t,i)=>({...t,key:'d'+d.day+'_'+i})).filter(t=>t.t!=='日常开票制单、银行回单处理')}));
+  [5,10,16,30].forEach(day=>{
+    const zk=zakouTaxTasks(day);
+    if(!zk.length)return;
+    const hit=out.find(d=>d.day===day);
+    if(hit)hit.tasks=hit.tasks.concat(zk);
+    else out.push({day,tasks:zk});
+  });
+  return out.filter(d=>d.tasks.length).sort((a,b)=>a.day-b.day);
 }
 function renderTimeline(){
   const container=document.getElementById('timelineSection');if(!container)return;
